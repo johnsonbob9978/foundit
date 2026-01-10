@@ -1,0 +1,16 @@
+[
+  {
+    "id": "2f80d196-12c2-408c-9b71-e96cef903c9a",
+    "title": "hello",
+    "description": "hello",
+    "category": "electronics",
+    "location": "assa",
+    "date_found": "2026-01-09",
+    "finder_name": "nyasa",
+    "finder_email": "nyasa@gmail.com",
+    "finder_phone": "7777777777",
+    "photo": "/uploads/319f4538-fa83-472c-920a-858d81daeb4d.png",
+    "status": "approved",
+    "created_at": "2026-01-10T02:27:53.932Z"
+  }
+]
