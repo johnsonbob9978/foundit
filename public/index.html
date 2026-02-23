@@ -3,27 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Lost & Found</title>
+    <title>Viking Finder - South Brunswick High School Lost & Found</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="logo" data-page="home">
-                <span class="logo-icon">🔍</span>
-                <span class="logo-text">SB FoundIt</span>
+                <img src="/images/sbhs.jpeg" alt="SBHS Logo" class="logo-image">
+                <span class="logo-text">Viking Finder</span>
             </a>
             <ul class="nav-links">
-                <li><a href="#" data-page="home" class="active">Home</a></li>
-                <li><a href="#" data-page="browse">Browse Items</a></li>
-                <li><a href="#" data-page="report">Report Found</a></li>
-                <li><a href="admin.html" class="admin-link">Admin</a></li>
+                <li><a href="#" data-page="home" class="active" aria-label="Home page">Home</a></li>
+                <li><a href="#" data-page="browse" aria-label="Browse found items">Browse Items</a></li>
+                <li><a href="#" data-page="report" aria-label="Report a found item">Report Found</a></li>
+                <li><a href="#" data-page="lost" aria-label="Report a lost item">Report Lost</a></li>
+                <li><a href="#" data-page="mission" aria-label="Our mission">Our Mission</a></li>
+                <li><a href="#" data-page="stats" aria-label="View statistics">Stats</a></li>
+                <li><a href="admin.html" class="admin-link" aria-label="Admin panel">Admin</a></li>
             </ul>
-            <button class="mobile-menu-btn" aria-label="Toggle menu">
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
+            <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -32,12 +52,15 @@
     </nav>
 
     <!-- Mobile Menu -->
-    <div class="mobile-menu">
-        <ul>
-            <li><a href="#" data-page="home">Home</a></li>
-            <li><a href="#" data-page="browse">Browse Items</a></li>
-            <li><a href="#" data-page="report">Report Found</a></li>
-            <li><a href="admin.html">Admin Panel</a></li>
+    <div class="mobile-menu" id="mobile-menu" role="navigation" aria-label="Mobile navigation menu">
+            <ul>
+            <li><a href="#" data-page="home" aria-label="Home page">Home</a></li>
+            <li><a href="#" data-page="browse" aria-label="Browse found items">Browse Items</a></li>
+            <li><a href="#" data-page="report" aria-label="Report a found item">Report Found</a></li>
+            <li><a href="#" data-page="lost" aria-label="Report a lost item">Report Lost</a></li>
+            <li><a href="#" data-page="mission" aria-label="Our mission">Our Mission</a></li>
+            <li><a href="#" data-page="stats" aria-label="View statistics">Stats</a></li>
+            <li><a href="admin.html" aria-label="Admin panel">Admin Panel</a></li>
         </ul>
     </div>
 
@@ -50,9 +73,9 @@
                 <div class="hero-shape shape-3"></div>
             </div>
             <div class="hero-content">
-                <span class="hero-badge">For Students & Staff</span>
-                <h1>Lost Something?<br><span class="gradient-text">We'll Help You Find It.</span></h1>
-                <p>Our school's lost and found system makes it easy to report found items and search for your missing belongings. Together, we can reunite everyone with their stuff!</p>
+                <span class="hero-badge">South Brunswick High School</span>
+                <h1>Lost Something?<br><span class="gradient-text">Viking Finder Will Help!</span></h1>
+                <p>South Brunswick High School's official lost and found system. Report found items or search for your missing belongings. Let's reunite Vikings with their items!</p>
                 <div class="hero-buttons">
                     <button class="btn btn-primary" data-page="browse">
                         <span>Browse Found Items</span>
@@ -98,13 +121,13 @@
                         <div class="step-number">01</div>
                         <div class="step-icon">📋</div>
                         <h3>Report or Search</h3>
-                        <p>Found something? Report it with a photo. Lost something? Browse our listings or use search.</p>
+                        <p>Found something around SBHS? Report it with a photo. Lost something? Browse our listings or use search.</p>
                     </div>
                     <div class="step-card">
                         <div class="step-number">02</div>
                         <div class="step-icon">✅</div>
                         <h3>Admin Review</h3>
-                        <p>Our staff reviews submissions to ensure accuracy and prevent misuse of the system.</p>
+                        <p>SBHS staff reviews submissions to ensure accuracy and prevent misuse of the system.</p>
                     </div>
                     <div class="step-card">
                         <div class="step-number">03</div>
@@ -116,7 +139,7 @@
                         <div class="step-number">04</div>
                         <div class="step-icon">🎉</div>
                         <h3>Reunited!</h3>
-                        <p>Once verified, pick up your item from the main office. Happy reunion!</p>
+                        <p>Once verified, pick up your item from the SBHS main office. Happy reunion, Viking!</p>
                     </div>
                 </div>
             </div>
@@ -147,7 +170,7 @@
                 <div class="cta-card">
                     <div class="cta-content">
                         <h2>Found Something?</h2>
-                        <p>Help a fellow student or staff member by reporting the item you found. It only takes a minute!</p>
+                        <p>Help a fellow Viking by reporting the item you found. It only takes a minute to make someone's day!</p>
                         <button class="btn btn-primary" data-page="report">Report Found Item</button>
                     </div>
                     <div class="cta-visual">
@@ -172,20 +195,29 @@
             <div class="container">
                 <div class="filters-bar">
                     <div class="search-box">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <circle cx="11" cy="11" r="8"/>
                             <path d="m21 21-4.35-4.35"/>
                         </svg>
-                        <input type="text" id="search-input" placeholder="Search items...">
+                        <input type="text" id="search-input" placeholder="Search items..." aria-label="Search for items">
                     </div>
-                    <div class="category-filters">
-                        <button class="filter-btn active" data-category="all">All</button>
-                        <button class="filter-btn" data-category="electronics">Electronics</button>
-                        <button class="filter-btn" data-category="clothing">Clothing</button>
-                        <button class="filter-btn" data-category="accessories">Accessories</button>
-                        <button class="filter-btn" data-category="books">Books</button>
-                        <button class="filter-btn" data-category="sports">Sports</button>
-                        <button class="filter-btn" data-category="other">Other</button>
+                    <div class="filters-row">
+                        <div class="category-filters">
+                            <button class="filter-btn active" data-category="all" aria-label="Filter: All categories">All</button>
+                            <button class="filter-btn" data-category="electronics" aria-label="Filter: Electronics">Electronics</button>
+                            <button class="filter-btn" data-category="clothing" aria-label="Filter: Clothing">Clothing</button>
+                            <button class="filter-btn" data-category="accessories" aria-label="Filter: Accessories">Accessories</button>
+                            <button class="filter-btn" data-category="books" aria-label="Filter: Books">Books</button>
+                            <button class="filter-btn" data-category="sports" aria-label="Filter: Sports">Sports</button>
+                            <button class="filter-btn" data-category="other" aria-label="Filter: Other">Other</button>
+                        </div>
+                        <div class="sort-controls">
+                            <label for="sort-select" class="sort-label">Sort by:</label>
+                            <select id="sort-select" class="sort-select" aria-label="Sort items">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -202,6 +234,206 @@
                 <div class="loading-state" id="loading-items">
                     <div class="spinner"></div>
                     <p>Loading items...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Report Lost Item Page -->
+    <main id="lost" class="page">
+        <section class="page-header">
+            <div class="container">
+                <span class="section-badge">Need Help Finding Something?</span>
+                <h1>Report a Lost Item</h1>
+                <p>Fill out the form below to report an item you've lost. If it's found, we'll contact you immediately!</p>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="container">
+                <form id="lost-form" class="item-form">
+                    <div class="form-grid">
+                        <div class="form-left">
+                            <div class="form-group">
+                                <label for="lost-item-title">Item Name *</label>
+                                <input type="text" id="lost-item-title" name="title" required placeholder="e.g., Blue Nike Backpack" aria-required="true">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="lost-item-category">Category *</label>
+                                <select id="lost-item-category" name="category" required aria-required="true">
+                                    <option value="">Select a category</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="clothing">Clothing</option>
+                                    <option value="accessories">Accessories</option>
+                                    <option value="books">Books & Supplies</option>
+                                    <option value="sports">Sports Equipment</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="lost-item-location">Location Lost *</label>
+                                    <input type="text" id="lost-item-location" name="location_lost" required placeholder="e.g., Library 2nd Floor" aria-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="lost-item-date">Date Lost *</label>
+                                    <input type="date" id="lost-item-date" name="date_lost" required aria-required="true">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="lost-item-description">Description</label>
+                                <textarea id="lost-item-description" name="description" rows="4" placeholder="Describe the item in detail (color, brand, distinguishing features, contents, etc.)" aria-label="Item description"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-right">
+                            <div class="form-divider">
+                                <span>Your Contact Info</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="owner-name">Your Name *</label>
+                                <input type="text" id="owner-name" name="owner_name" required placeholder="Your full name" aria-required="true">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="owner-email">Email *</label>
+                                <input type="email" id="owner-email" name="owner_email" required placeholder="your.email@school.edu" aria-required="true">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="owner-phone">Phone (Optional)</label>
+                                <input type="tel" id="owner-phone" name="owner_phone" placeholder="(555) 123-4567" aria-label="Phone number">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-large" aria-label="Submit lost item report">
+                            <span>Submit Report</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Our Mission Page -->
+    <main id="mission" class="page">
+        <section class="page-header">
+            <div class="container">
+                <span class="section-badge">About Viking Finder</span>
+                <h1>Our Mission</h1>
+                <p>Helping the South Brunswick High School community reunite with lost belongings.</p>
+            </div>
+        </section>
+
+        <section class="mission-section">
+            <div class="container">
+                <div class="mission-content">
+                    <div class="mission-card">
+                        <div class="mission-icon">🎯</div>
+                        <h2>Our Purpose</h2>
+                        <p>Viking Finder was created to help students and staff at South Brunswick High School quickly and easily reunite with their lost belongings. We believe that every lost item deserves to find its way home.</p>
+                    </div>
+
+                    <div class="mission-card">
+                        <div class="mission-icon">🤝</div>
+                        <h2>Community First</h2>
+                        <p>We're built by Vikings, for Vikings. Our platform relies on the kindness and honesty of our school community to report found items and help others recover what they've lost.</p>
+                    </div>
+
+                    <div class="mission-card">
+                        <div class="mission-icon">⚡</div>
+                        <h2>Fast & Easy</h2>
+                        <p>With just a few clicks, you can report a found item or search for something you've lost. Our streamlined process makes it simple for everyone to participate.</p>
+                    </div>
+
+                    <div class="mission-card">
+                        <div class="mission-icon">🔒</div>
+                        <h2>Safe & Secure</h2>
+                        <p>All submissions are reviewed by SBHS staff before being made public. We verify claims to ensure items are returned to their rightful owners.</p>
+                    </div>
+                </div>
+
+                <div class="mission-values">
+                    <h2>Our Values</h2>
+                    <div class="values-grid">
+                        <div class="value-item">
+                            <h3>Honesty</h3>
+                            <p>We trust our community to report items accurately and claim only what belongs to them.</p>
+                        </div>
+                        <div class="value-item">
+                            <h3>Kindness</h3>
+                            <p>Helping others find their lost items is an act of kindness that strengthens our community.</p>
+                        </div>
+                        <div class="value-item">
+                            <h3>Efficiency</h3>
+                            <p>We've designed Viking Finder to be fast and easy to use, so items can be reunited quickly.</p>
+                        </div>
+                        <div class="value-item">
+                            <h3>Community</h3>
+                            <p>Together, we can help every Viking find what they've lost and keep our school organized.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-cta">
+                    <h2>Ready to Help?</h2>
+                    <p>Join us in making South Brunswick High School a place where lost items always find their way home.</p>
+                    <div class="mission-buttons">
+                        <button class="btn btn-primary" data-page="report">Report a Found Item</button>
+                        <button class="btn btn-secondary" data-page="browse">Browse Found Items</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Statistics Page -->
+    <main id="stats" class="page">
+        <section class="page-header">
+            <div class="container">
+                <span class="section-badge">Viking Finder Statistics</span>
+                <h1>Lost & Found Statistics</h1>
+                <p>See how our community is helping reunite Vikings with their belongings.</p>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card-large">
+                        <div class="stat-icon-large">📦</div>
+                        <div class="stat-value-large" id="stat-total-found">-</div>
+                        <div class="stat-label-large">Items Found</div>
+                    </div>
+                    <div class="stat-card-large">
+                        <div class="stat-icon-large">✅</div>
+                        <div class="stat-value-large" id="stat-claimed">-</div>
+                        <div class="stat-label-large">Items Claimed</div>
+                    </div>
+                    <div class="stat-card-large">
+                        <div class="stat-icon-large">📊</div>
+                        <div class="stat-value-large" id="stat-success-rate">-</div>
+                        <div class="stat-label-large">Success Rate</div>
+                    </div>
+                    <div class="stat-card-large">
+                        <div class="stat-icon-large">📅</div>
+                        <div class="stat-value-large" id="stat-this-month">-</div>
+                        <div class="stat-label-large">Found This Month</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h2>Items by Category</h2>
+                    <canvas id="category-chart" aria-label="Chart showing items found by category"></canvas>
                 </div>
             </div>
         </section>
@@ -224,12 +456,12 @@
                         <div class="form-left">
                             <div class="form-group">
                                 <label for="item-title">Item Name *</label>
-                                <input type="text" id="item-title" name="title" required placeholder="e.g., Blue Nike Backpack">
+                                <input type="text" id="item-title" name="title" required placeholder="e.g., Blue Nike Backpack" aria-required="true" aria-label="Item name">
                             </div>
 
                             <div class="form-group">
                                 <label for="item-category">Category *</label>
-                                <select id="item-category" name="category" required>
+                                <select id="item-category" name="category" required aria-required="true" aria-label="Item category">
                                     <option value="">Select a category</option>
                                     <option value="electronics">Electronics</option>
                                     <option value="clothing">Clothing</option>
@@ -300,9 +532,9 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary btn-large">
+                        <button type="submit" class="btn btn-primary btn-large" aria-label="Submit found item report">
                             <span>Submit Report</span>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
                         </button>
@@ -313,10 +545,10 @@
     </main>
 
     <!-- Item Detail Modal -->
-    <div class="modal" id="item-modal">
-        <div class="modal-backdrop"></div>
+    <div class="modal" id="item-modal" role="dialog" aria-labelledby="item-modal-title" aria-modal="true">
+        <div class="modal-backdrop" aria-label="Close modal"></div>
         <div class="modal-content">
-            <button class="modal-close" id="modal-close">×</button>
+            <button class="modal-close" id="modal-close" aria-label="Close modal">×</button>
             <div class="modal-body" id="modal-body">
                 <!-- Content loaded dynamically -->
             </div>
@@ -324,10 +556,10 @@
     </div>
 
     <!-- Claim Form Modal -->
-    <div class="modal" id="claim-modal">
-        <div class="modal-backdrop"></div>
+    <div class="modal" id="claim-modal" role="dialog" aria-labelledby="claim-modal-title" aria-modal="true">
+        <div class="modal-backdrop" aria-label="Close modal"></div>
         <div class="modal-content">
-            <button class="modal-close" id="claim-modal-close">×</button>
+            <button class="modal-close" id="claim-modal-close" aria-label="Close modal">×</button>
             <div class="modal-body">
                 <h2>Claim This Item</h2>
                 <p class="claim-item-name" id="claim-item-name"></p>
@@ -355,8 +587,8 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn btn-outline" id="cancel-claim">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Submit Claim</button>
+                        <button type="button" class="btn btn-outline" id="cancel-claim" aria-label="Cancel claim">Cancel</button>
+                        <button type="submit" class="btn btn-primary" aria-label="Submit claim">Submit Claim</button>
                     </div>
                 </form>
             </div>
@@ -371,16 +603,22 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <span class="logo-icon">🔍</span>
-                    <span class="logo-text">FoundIt</span>
+                    <img src="/images/sbhs.jpeg" alt="SBHS Logo" class="footer-logo">
+                    <span class="logo-text">Viking Finder</span>
                 </div>
-                <p>Helping our school community reunite with lost belongings.</p>
+                <p>South Brunswick High School's official lost and found system. Helping Vikings reunite with their belongings.</p>
             </div>
             <div class="footer-links">
                 <a href="#" data-page="home">Home</a>
                 <a href="#" data-page="browse">Browse Items</a>
                 <a href="#" data-page="report">Report Found</a>
+                <a href="#" data-page="lost">Report Lost</a>
+                <a href="#" data-page="mission">Our Mission</a>
+                <a href="#" data-page="stats">Statistics</a>
                 <a href="admin.html">Admin</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Viking Finder - South Brunswick High School. Helping Vikings reunite with their belongings.</p>
             </div>
         </div>
     </footer>

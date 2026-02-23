@@ -133,6 +133,41 @@ Note: Delete the `foundit.db` file to reset the database with new credentials.
 - Modify `--color-primary` for the main brand color
 - Modify `--color-accent` for accent elements
 
+## Email Notifications
+
+Viking Finder can send email notifications when lost items are matched with found items.
+
+### Demo Mode (Default)
+By default, emails are logged to the console for demonstration purposes. This is perfect for the competition as it doesn't require email configuration.
+
+### Production Setup
+To enable actual email sending, edit the `email.config.json` file:
+
+```json
+{
+  "enabled": true,
+  "host": "smtp.gmail.com",
+  "port": 587,
+  "secure": false,
+  "user": "your-email@gmail.com",
+  "password": "your-app-password",
+  "from": "vikingfinder@sbhs.edu",
+  "siteUrl": "https://your-domain.com"
+}
+```
+
+**Note:** 
+- Set `"enabled": true` to activate email sending
+- For Gmail, you'll need to use an [App Password](https://support.google.com/accounts/answer/185833) instead of your regular password
+- Update `siteUrl` to your actual website URL
+
+### Email Content
+When a lost item is matched, the owner receives an email with:
+- Details of their lost item
+- Details of the found item
+- Instructions on how to claim the item
+- Link to the Viking Finder website
+
 ## License
 
 This project is created for educational purposes as a school project.

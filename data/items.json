@@ -10,7 +10,289 @@
     "finder_email": "nyasa@gmail.com",
     "finder_phone": "7777777777",
     "photo": "/uploads/319f4538-fa83-472c-920a-858d81daeb4d.png",
+    "status": "claimed",
+    "created_at": "2026-01-10T02:27:53.932Z",
+    "history": [
+      {
+        "action": "claimed",
+        "timestamp": "2026-02-23T00:28:03.459Z",
+        "by": "helloi",
+        "email": "nyass@gmail.com",
+        "details": "Item claimed by helloi. Approved by Admin"
+      }
+    ]
+  },
+  {
+    "id": "e3b50c68-f11c-4fb4-8d22-f34c50a93334",
+    "title": "asasc",
+    "description": "sacsdsdc",
+    "category": "clothing",
+    "location": "scdsdc",
+    "date_found": "2026-02-23",
+    "finder_name": "Rachit Khandelwal",
+    "finder_email": "krachit@umich.edu",
+    "finder_phone": "7328109978",
+    "photo": "/uploads/bfb30ed8-9a79-487e-a487-5bed4be176e8.jpeg",
     "status": "approved",
-    "created_at": "2026-01-10T02:27:53.932Z"
+    "created_at": "2026-02-23T00:15:22.516Z",
+    "history": [
+      {
+        "action": "found",
+        "timestamp": "2026-02-23T00:15:22.516Z",
+        "by": "Rachit Khandelwal",
+        "email": "krachit@umich.edu",
+        "details": "Found at scdsdc on 2026-02-23"
+      },
+      {
+        "action": "status_changed",
+        "timestamp": "2026-02-23T00:15:48.094Z",
+        "by": "Admin",
+        "details": "Status changed from pending to approved"
+      },
+      {
+        "action": "approved",
+        "timestamp": "2026-02-23T00:15:48.094Z",
+        "by": "Admin",
+        "details": "Item approved and made public"
+      },
+      {
+        "action": "matched_with_lost_item",
+        "timestamp": "2026-02-23T00:43:31.335Z",
+        "by": "Admin",
+        "details": "Matched with lost item report by sdcsd"
+      },
+      {
+        "action": "matched_with_lost_item",
+        "timestamp": "2026-02-23T01:01:22.134Z",
+        "by": "Admin",
+        "details": "Matched with lost item report by Rachit Khandelwal"
+      },
+      {
+        "action": "matched_with_lost_item",
+        "timestamp": "2026-02-23T01:02:59.278Z",
+        "by": "Admin",
+        "details": "Matched with lost item report by Rachit Khandelwal"
+      },
+      {
+        "action": "matched_with_lost_item",
+        "timestamp": "2026-02-23T01:04:54.254Z",
+        "by": "Admin",
+        "details": "Matched with lost item report by Rachit Khandelwal"
+      },
+      {
+        "action": "matched_with_lost_item",
+        "timestamp": "2026-02-23T01:06:42.868Z",
+        "by": "Admin",
+        "details": "Matched with lost item report by Rachit Khandelwal"
+      },
+      {
+        "action": "matched_with_lost_item",
+        "timestamp": "2026-02-23T01:11:54.592Z",
+        "by": "Admin",
+        "details": "Matched with lost item report by Rachit Khandelwal"
+      },
+      {
+        "action": "matched_with_lost_item",
+        "timestamp": "2026-02-23T01:14:08.060Z",
+        "by": "Admin",
+        "details": "Matched with lost item report by Rachit Khandelwal"
+      },
+      {
+        "action": "matched_with_lost_item",
+        "timestamp": "2026-02-23T01:17:37.673Z",
+        "by": "Admin",
+        "details": "Matched with lost item report by Rachit Khandelwal"
+      }
+    ]
+  },
+  {
+    "id": "cd6c648b-a810-4e06-a6cc-e0ea8a9f412c",
+    "title": "bhhbh",
+    "description": "hnnjjnjn",
+    "category": "accessories",
+    "location": "njnjjn",
+    "date_found": "2026-02-23",
+    "finder_name": "hhhh",
+    "finder_email": "krachit@umich.edu",
+    "finder_phone": "7328109978",
+    "photo": "/uploads/6bb92c81-3da8-4f03-9bd7-711ca2d96357.jpeg",
+    "status": "rejected",
+    "created_at": "2026-02-23T01:01:04.622Z",
+    "history": [
+      {
+        "action": "found",
+        "timestamp": "2026-02-23T01:01:04.622Z",
+        "by": "hhhh",
+        "email": "krachit@umich.edu",
+        "details": "Found at njnjjn on 2026-02-23"
+      },
+      {
+        "action": "status_changed",
+        "timestamp": "2026-02-23T01:01:52.083Z",
+        "by": "Admin",
+        "details": "Status changed from pending to rejected"
+      }
+    ]
+  },
+  {
+    "id": "cba46a6e-2c34-43de-a326-082282483248",
+    "title": "scdsdcsd",
+    "description": "sdccsdscd",
+    "category": "sports",
+    "location": "sdcsdc",
+    "date_found": "2026-02-23",
+    "finder_name": "Rachit Khandelwal",
+    "finder_email": "krachit@umich.edu",
+    "finder_phone": "7328109978",
+    "photo": "/uploads/9fbf5063-52b3-4325-a05e-883988cc156e.jpeg",
+    "status": "pending",
+    "created_at": "2026-02-23T01:02:35.246Z",
+    "history": [
+      {
+        "action": "found",
+        "timestamp": "2026-02-23T01:02:35.246Z",
+        "by": "Rachit Khandelwal",
+        "email": "krachit@umich.edu",
+        "details": "Found at sdcsdc on 2026-02-23"
+      }
+    ]
+  },
+  {
+    "id": "185abdaa-eca5-455e-adea-e143a5713126",
+    "title": "ascasc",
+    "description": "acsasc",
+    "category": "books",
+    "location": "ascascacs",
+    "date_found": "2026-02-23",
+    "finder_name": "Rachit Khandelwal",
+    "finder_email": "krachit@umich.edu",
+    "finder_phone": "7328109978",
+    "photo": null,
+    "status": "pending",
+    "created_at": "2026-02-23T01:04:20.992Z",
+    "history": [
+      {
+        "action": "found",
+        "timestamp": "2026-02-23T01:04:20.992Z",
+        "by": "Rachit Khandelwal",
+        "email": "krachit@umich.edu",
+        "details": "Found at ascascacs on 2026-02-23"
+      }
+    ]
+  },
+  {
+    "id": "804c17e3-7ff4-41ce-9540-fac9e1ce72ef",
+    "title": "sdcsdcsd",
+    "description": "sdcsds",
+    "category": "accessories",
+    "location": "scsd",
+    "date_found": "2026-02-23",
+    "finder_name": "Rachit Khandelwal",
+    "finder_email": "krachit@umich.edu",
+    "finder_phone": "7328109978",
+    "photo": null,
+    "status": "pending",
+    "created_at": "2026-02-23T01:06:21.609Z",
+    "history": [
+      {
+        "action": "found",
+        "timestamp": "2026-02-23T01:06:21.609Z",
+        "by": "Rachit Khandelwal",
+        "email": "krachit@umich.edu",
+        "details": "Found at scsd on 2026-02-23"
+      }
+    ]
+  },
+  {
+    "id": "e2b13c56-3981-4029-9cad-76a92641b7d9",
+    "title": "sdcsd",
+    "description": "scsdc",
+    "category": "accessories",
+    "location": "sdcsdc",
+    "date_found": "2026-02-23",
+    "finder_name": "Rachit Khandelwal",
+    "finder_email": "krachit@umich.edu",
+    "finder_phone": "7328109978",
+    "photo": null,
+    "status": "pending",
+    "created_at": "2026-02-23T01:11:31.927Z",
+    "history": [
+      {
+        "action": "found",
+        "timestamp": "2026-02-23T01:11:31.927Z",
+        "by": "Rachit Khandelwal",
+        "email": "krachit@umich.edu",
+        "details": "Found at sdcsdc on 2026-02-23"
+      }
+    ]
+  },
+  {
+    "id": "ac3eaa3f-ab6e-45b1-864d-37c13fff4141",
+    "title": "zx x",
+    "description": "",
+    "category": "accessories",
+    "location": "dfv",
+    "date_found": "2026-02-23",
+    "finder_name": "Rachit Khandelwal",
+    "finder_email": "krachit@umich.edu",
+    "finder_phone": "7328109978",
+    "photo": null,
+    "status": "pending",
+    "created_at": "2026-02-23T01:13:16.071Z",
+    "history": [
+      {
+        "action": "found",
+        "timestamp": "2026-02-23T01:13:16.071Z",
+        "by": "Rachit Khandelwal",
+        "email": "krachit@umich.edu",
+        "details": "Found at dfv on 2026-02-23"
+      }
+    ]
+  },
+  {
+    "id": "9b057450-344f-46cd-8bd5-b49222fbea71",
+    "title": "scdsd",
+    "description": "",
+    "category": "electronics",
+    "location": "sdcsdc",
+    "date_found": "2026-02-23",
+    "finder_name": "Rachit Khandelwal",
+    "finder_email": "krachit@umich.edu",
+    "finder_phone": "7328109978",
+    "photo": null,
+    "status": "pending",
+    "created_at": "2026-02-23T01:16:55.576Z",
+    "history": [
+      {
+        "action": "found",
+        "timestamp": "2026-02-23T01:16:55.576Z",
+        "by": "Rachit Khandelwal",
+        "email": "krachit@umich.edu",
+        "details": "Found at sdcsdc on 2026-02-23"
+      }
+    ]
+  },
+  {
+    "id": "330eb412-64ac-4792-a51c-71f68dce7511",
+    "title": "sccdssd",
+    "description": "",
+    "category": "clothing",
+    "location": "scsdd",
+    "date_found": "2026-02-23",
+    "finder_name": "Rachit Khandelwal",
+    "finder_email": "krachit@umich.edu",
+    "finder_phone": "7328109978",
+    "photo": null,
+    "status": "pending",
+    "created_at": "2026-02-23T01:17:06.636Z",
+    "history": [
+      {
+        "action": "found",
+        "timestamp": "2026-02-23T01:17:06.636Z",
+        "by": "Rachit Khandelwal",
+        "email": "krachit@umich.edu",
+        "details": "Found at scsdd on 2026-02-23"
+      }
+    ]
   }
 ]

@@ -132,6 +132,8 @@ function navigateToSection(section) {
         loadClaims();
     } else if (section === 'dashboard') {
         loadDashboardData();
+    } else if (section === 'lost-items') {
+        loadLostItems();
     }
 }
 
@@ -153,11 +155,21 @@ async function loadDashboardData() {
         // Update badges
         document.getElementById('pending-items-badge').textContent = stats.pendingItems;
         document.getElementById('pending-claims-badge').textContent = stats.pendingClaims;
+        const lostItemsBadge = document.getElementById('active-lost-items-badge');
+        if (lostItemsBadge) {
+            lostItemsBadge.textContent = stats.activeLostItems || 0;
+        }
         
-        // Load recent submissions
+        // Load recent submissions first (needed for timeline chart)
         const itemsResponse = await fetch('/api/admin/items');
         const items = await itemsResponse.json();
         renderRecentSubmissions(items.slice(0, 5));
+        
+        // Render charts after a small delay to ensure Chart.js is loaded
+        setTimeout(() => {
+            renderCategoryChart(stats.categoryCounts || {});
+            renderTimelineChart(items);
+        }, 100);
         
         // Load recent claims
         const claimsResponse = await fetch('/api/admin/claims');
@@ -166,6 +178,147 @@ async function loadDashboardData() {
         
     } catch (error) {
         console.error('Failed to load dashboard data:', error);
+    }
+}
+
+function renderCategoryChart(categoryCounts) {
+    const ctx = document.getElementById('admin-category-chart');
+    if (!ctx) {
+        console.error('Category chart canvas not found');
+        return;
+    }
+    
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        ctx.parentElement.innerHTML = '<p style="text-align: center; color: var(--color-text-muted);">Chart library not loaded</p>';
+        return;
+    }
+    
+    const labels = Object.keys(categoryCounts);
+    const data = Object.values(categoryCounts);
+    
+    // Handle empty data
+    if (labels.length === 0 || data.every(v => v === 0)) {
+        ctx.parentElement.innerHTML = '<p style="text-align: center; color: var(--color-text-muted); padding: 2rem;">No items found yet</p>';
+        return;
+    }
+    
+    // Destroy existing chart if it exists
+    if (ctx.chart) {
+        ctx.chart.destroy();
+    }
+    
+    try {
+        ctx.chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        '#1e40af',
+                        '#3b82f6',
+                        '#f59e0b',
+                        '#10b981',
+                        '#ef4444',
+                        '#8b5cf6'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error rendering category chart:', error);
+        ctx.parentElement.innerHTML = '<p style="text-align: center; color: var(--color-error);">Error loading chart</p>';
+    }
+}
+
+function renderTimelineChart(items) {
+    const ctx = document.getElementById('admin-timeline-chart');
+    if (!ctx) {
+        console.error('Timeline chart canvas not found');
+        return;
+    }
+    
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        ctx.parentElement.innerHTML = '<p style="text-align: center; color: var(--color-text-muted);">Chart library not loaded</p>';
+        return;
+    }
+    
+    if (!items || items.length === 0) {
+        ctx.parentElement.innerHTML = '<p style="text-align: center; color: var(--color-text-muted); padding: 2rem;">No items found yet</p>';
+        return;
+    }
+    
+    // Group items by date
+    const dateMap = {};
+    items.forEach(item => {
+        if (item.created_at) {
+            const date = new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            dateMap[date] = (dateMap[date] || 0) + 1;
+        }
+    });
+    
+    // Get last 7 days
+    const dates = [];
+    const counts = [];
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        dates.push(dateStr);
+        counts.push(dateMap[dateStr] || 0);
+    }
+    
+    // Destroy existing chart if it exists
+    if (ctx.chart) {
+        ctx.chart.destroy();
+    }
+    
+    try {
+        ctx.chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Items Found',
+                    data: counts,
+                    borderColor: '#1e40af',
+                    backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error rendering timeline chart:', error);
+        ctx.parentElement.innerHTML = '<p style="text-align: center; color: var(--color-error);">Error loading chart</p>';
     }
 }
 
@@ -319,10 +472,11 @@ function renderItemsTable(items) {
 
 async function updateItemStatus(id, status) {
     try {
+        const adminName = localStorage.getItem('admin_name') || 'Admin';
         const response = await fetch(`/api/admin/items/${id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
+            body: JSON.stringify({ status, admin_name: adminName })
         });
 
         if (response.ok) {
@@ -423,10 +577,11 @@ function renderClaims(claims) {
 
 async function updateClaimStatus(id, status) {
     try {
+        const adminName = localStorage.getItem('admin_name') || 'Admin';
         const response = await fetch(`/api/admin/claims/${id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
+            body: JSON.stringify({ status, admin_name: adminName })
         });
 
         if (response.ok) {
@@ -453,9 +608,28 @@ function initModals() {
     closeBtn?.addEventListener('click', closeItemDetail);
     backdrop?.addEventListener('click', closeItemDetail);
     
+    // Match modal
+    const matchModal = document.getElementById('match-item-modal');
+    const matchCloseBtn = document.getElementById('match-modal-close');
+    const matchBackdrop = matchModal?.querySelector('.modal-backdrop');
+    
+    matchCloseBtn?.addEventListener('click', closeMatchModal);
+    matchBackdrop?.addEventListener('click', closeMatchModal);
+    
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeItemDetail();
+        if (e.key === 'Escape') {
+            closeItemDetail();
+            closeMatchModal();
+        }
     });
+}
+
+function closeMatchModal() {
+    const modal = document.getElementById('match-item-modal');
+    if (modal) {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+    }
 }
 
 async function openItemDetail(id) {
@@ -526,6 +700,30 @@ async function openItemDetail(id) {
                     </div>
                 </div>
                 
+                ${item.history && item.history.length > 0 ? `
+                    <div class="description-box">
+                        <h3>Item History</h3>
+                        <div class="history-timeline">
+                            ${item.history.map(entry => `
+                                <div class="history-entry">
+                                    <div class="history-icon">
+                                        ${getHistoryIcon(entry.action)}
+                                    </div>
+                                    <div class="history-content">
+                                        <div class="history-action">${escapeHtml(entry.action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()))}</div>
+                                        <div class="history-details">${escapeHtml(entry.details || '')}</div>
+                                        <div class="history-meta">
+                                            <span>By: ${escapeHtml(entry.by || 'Unknown')}</span>
+                                            <span>•</span>
+                                            <span>${formatDateTime(entry.timestamp)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
                 <div class="modal-actions">
                     <button class="btn btn-secondary" onclick="closeItemDetail()">Close</button>
                     ${item.status === 'pending' ? `
@@ -550,6 +748,229 @@ function closeItemDetail() {
 }
 
 // ========================================
+// Lost Items Management
+// ========================================
+
+async function loadLostItems() {
+    const container = document.getElementById('lost-items-list');
+    const emptyState = document.getElementById('no-lost-items');
+    
+    try {
+        const response = await fetch('/api/admin/lost-items');
+        const lostItems = await response.json();
+        
+        if (!lostItems || lostItems.length === 0) {
+            if (container) container.innerHTML = '';
+            if (emptyState) emptyState.style.display = 'block';
+        } else {
+            if (emptyState) emptyState.style.display = 'none';
+            renderLostItems(lostItems);
+        }
+    } catch (error) {
+        console.error('Failed to load lost items:', error);
+        showToast('Failed to load lost items', 'error');
+    }
+}
+
+function renderLostItems(lostItems) {
+    const container = document.getElementById('lost-items-list');
+    if (!container) return;
+    
+    container.innerHTML = lostItems.map(lostItem => `
+        <div class="claim-card">
+            <div class="claim-header">
+                <div>
+                    <h3>${escapeHtml(lostItem.title)}</h3>
+                    <span class="status-badge ${lostItem.status}">${lostItem.status}</span>
+                </div>
+                <span class="claim-date">${formatDate(lostItem.created_at)}</span>
+            </div>
+            <div class="claim-body">
+                <div class="claim-info">
+                    <div class="info-row">
+                        <span class="info-label">Category:</span>
+                        <span class="info-value">${escapeHtml(lostItem.category)}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Location Lost:</span>
+                        <span class="info-value">${escapeHtml(lostItem.location_lost)}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Date Lost:</span>
+                        <span class="info-value">${formatDate(lostItem.date_lost)}</span>
+                    </div>
+                    ${lostItem.description ? `
+                        <div class="info-row">
+                            <span class="info-label">Description:</span>
+                            <span class="info-value">${escapeHtml(lostItem.description)}</span>
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="claim-contact">
+                    <h4>Owner Information</h4>
+                    <p><strong>Name:</strong> ${escapeHtml(lostItem.owner_name)}</p>
+                    <p><strong>Email:</strong> ${escapeHtml(lostItem.owner_email)}</p>
+                    ${lostItem.owner_phone ? `<p><strong>Phone:</strong> ${escapeHtml(lostItem.owner_phone)}</p>` : ''}
+                </div>
+            </div>
+            <div class="claim-actions">
+                ${lostItem.status === 'active' ? `
+                    <button class="btn btn-primary" onclick="matchLostItem('${lostItem.id}')">Match with Found Item</button>
+                ` : lostItem.matched_item_id ? `
+                    <span class="matched-badge">Matched with item: ${lostItem.matched_item_id}</span>
+                ` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+async function matchLostItem(lostItemId) {
+    const modal = document.getElementById('match-item-modal');
+    const lostItemInfo = document.getElementById('lost-item-info');
+    const matchItemsList = document.getElementById('match-items-list');
+    const noMatchItems = document.getElementById('no-match-items');
+    const matchSearchInput = document.getElementById('match-search-input');
+    
+    // Load lost item details
+    try {
+        const lostItemsResponse = await fetch('/api/admin/lost-items');
+        const lostItems = await lostItemsResponse.json();
+        const lostItem = lostItems.find(item => item.id === lostItemId);
+        
+        if (!lostItem) {
+            showToast('Lost item not found', 'error');
+            return;
+        }
+        
+        // Display lost item info
+        lostItemInfo.innerHTML = `
+            <div class="match-lost-item-card">
+                <h3>Lost Item: ${escapeHtml(lostItem.title)}</h3>
+                <div class="match-item-details">
+                    <p><strong>Category:</strong> ${escapeHtml(lostItem.category)}</p>
+                    <p><strong>Location Lost:</strong> ${escapeHtml(lostItem.location_lost)}</p>
+                    <p><strong>Date Lost:</strong> ${formatDate(lostItem.date_lost)}</p>
+                    ${lostItem.description ? `<p><strong>Description:</strong> ${escapeHtml(lostItem.description)}</p>` : ''}
+                </div>
+            </div>
+        `;
+        
+        // Load found items
+        const itemsResponse = await fetch('/api/admin/items?status=approved');
+        const foundItems = await itemsResponse.json();
+        
+        // Filter out already claimed items and show only approved items
+        const availableItems = foundItems.filter(item => item.status === 'approved' || item.status === 'pending');
+        
+        if (availableItems.length === 0) {
+            matchItemsList.innerHTML = '';
+            noMatchItems.style.display = 'block';
+        } else {
+            noMatchItems.style.display = 'none';
+            renderMatchItems(availableItems, lostItemId, lostItem);
+        }
+        
+        // Setup search
+        let searchTimeout;
+        matchSearchInput.value = '';
+        matchSearchInput.oninput = (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filtered = availableItems.filter(item => 
+                    item.title.toLowerCase().includes(searchTerm) ||
+                    item.category.toLowerCase().includes(searchTerm) ||
+                    (item.description && item.description.toLowerCase().includes(searchTerm)) ||
+                    item.location.toLowerCase().includes(searchTerm)
+                );
+                renderMatchItems(filtered, lostItemId, lostItem);
+            }, 300);
+        };
+        
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    } catch (error) {
+        showToast('Failed to load items for matching', 'error');
+    }
+}
+
+function renderMatchItems(items, lostItemId, lostItem) {
+    const matchItemsList = document.getElementById('match-items-list');
+    const noMatchItems = document.getElementById('no-match-items');
+    
+    if (items.length === 0) {
+        matchItemsList.innerHTML = '';
+        noMatchItems.style.display = 'block';
+        return;
+    }
+    
+    noMatchItems.style.display = 'none';
+    
+    // Sort by relevance (same category first)
+    const sortedItems = items.sort((a, b) => {
+        const aMatch = a.category === lostItem.category ? 1 : 0;
+        const bMatch = b.category === lostItem.category ? 1 : 0;
+        return bMatch - aMatch;
+    });
+    
+    matchItemsList.innerHTML = sortedItems.map(item => `
+        <div class="match-item-card" onclick="confirmMatch('${lostItemId}', '${item.id}')">
+            <div class="match-item-image">
+                ${item.photo 
+                    ? `<img src="${item.photo}" alt="${escapeHtml(item.title)}">`
+                    : `<span class="match-item-icon">${getCategoryIcon(item.category)}</span>`
+                }
+            </div>
+            <div class="match-item-info">
+                <h4>${escapeHtml(item.title)}</h4>
+                <div class="match-item-meta">
+                    <span class="match-category">${escapeHtml(item.category)}</span>
+                    ${item.category === lostItem.category ? '<span class="match-badge">Same Category</span>' : ''}
+                </div>
+                <p class="match-item-location">📍 ${escapeHtml(item.location)}</p>
+                <p class="match-item-date">📅 Found: ${formatDate(item.date_found)}</p>
+                ${item.description ? `<p class="match-item-desc">${escapeHtml(item.description.substring(0, 100))}${item.description.length > 100 ? '...' : ''}</p>` : ''}
+            </div>
+            <button class="btn btn-primary btn-small">Match</button>
+        </div>
+    `).join('');
+}
+
+async function confirmMatch(lostItemId, foundItemId) {
+    if (!confirm('Are you sure you want to match these items? The owner will be notified.')) {
+        return;
+    }
+    
+    try {
+        const adminName = localStorage.getItem('admin_name') || 'Admin';
+        const response = await fetch('/api/admin/match-item', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                lost_item_id: lostItemId, 
+                found_item_id: foundItemId,
+                admin_name: adminName
+            })
+        });
+        
+        const result = await response.json();
+        if (response.ok) {
+            showToast('Items matched successfully! The owner has been notified.', 'success');
+            closeMatchModal();
+            loadLostItems();
+            loadDashboardData();
+        } else {
+            showToast(result.error || 'Failed to match items', 'error');
+        }
+    } catch (error) {
+        showToast('Failed to match items', 'error');
+    }
+}
+
+window.matchLostItem = matchLostItem;
+window.confirmMatch = confirmMatch;
+
+// ========================================
 // Utility Functions
 // ========================================
 
@@ -570,6 +991,30 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function getHistoryIcon(action) {
+    const icons = {
+        'found': '🔍',
+        'status_changed': '🔄',
+        'approved': '✅',
+        'claim_submitted': '📝',
+        'claimed': '🎉',
+        'matched_with_lost_item': '🔗'
+    };
+    return icons[action] || '📌';
+}
+
+function formatDateTime(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+    });
 }
 
 function formatDate(dateStr) {

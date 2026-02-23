@@ -7,6 +7,7 @@
 let currentPage = 'home';
 let currentCategory = 'all';
 let searchQuery = '';
+let sortBy = 'newest';
 let items = [];
 
 // DOM Elements
@@ -29,6 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initForms();
     initModals();
     initSearch();
+    initSorting();
+    initDarkMode();
+    initLostItemForm();
     loadRecentItems();
     setDefaultDate();
 });
@@ -74,6 +78,13 @@ function navigateTo(page) {
     // Load data for specific pages
     if (page === 'browse') {
         loadItems();
+    } else if (page === 'stats') {
+        loadStats();
+    } else if (page === 'lost') {
+        setDefaultDate('lost-item-date');
+    } else if (page === 'mission') {
+        // Mission page doesn't need data loading
+        initMissionButtons();
     }
 
     // Scroll to top
@@ -92,27 +103,28 @@ async function loadItems() {
     const loading = document.getElementById('loading-items');
     const empty = document.getElementById('no-items-found');
 
-    loading.style.display = 'block';
-    grid.innerHTML = '';
-    empty.style.display = 'none';
+    if (loading) loading.style.display = 'block';
+    if (grid) grid.innerHTML = '';
+    if (empty) empty.style.display = 'none';
 
     try {
         const params = new URLSearchParams();
         if (currentCategory !== 'all') params.append('category', currentCategory);
         if (searchQuery) params.append('search', searchQuery);
+        if (sortBy) params.append('sort', sortBy);
 
         const response = await fetch(`/api/items?${params}`);
         items = await response.json();
 
-        loading.style.display = 'none';
+        if (loading) loading.style.display = 'none';
 
         if (items.length === 0) {
-            empty.style.display = 'block';
+            if (empty) empty.style.display = 'block';
         } else {
-            renderItems(grid, items);
+            if (grid) renderItems(grid, items);
         }
     } catch (error) {
-        loading.style.display = 'none';
+        if (loading) loading.style.display = 'none';
         showToast('Failed to load items', 'error');
     }
 }
@@ -286,19 +298,24 @@ function initForms() {
                 body: formData
             });
 
-            const result = await response.json();
-
-            if (response.ok) {
-                showToast(result.message, 'success');
-                reportForm.reset();
-                document.getElementById('upload-preview').style.display = 'none';
-                document.getElementById('upload-placeholder').style.display = 'block';
-                setDefaultDate();
-            } else {
-                showToast(result.error || 'Failed to submit item', 'error');
+            if (!response.ok) {
+                const result = await response.json().catch(() => ({ error: `Server error: ${response.status} ${response.statusText}` }));
+                showToast(result.error || `Failed to submit item (${response.status})`, 'error');
+                console.error('Server response:', result);
+                return;
             }
+
+            const result = await response.json();
+            showToast(result.message, 'success');
+            reportForm.reset();
+            const preview = document.getElementById('upload-preview');
+            const placeholder = document.getElementById('upload-placeholder');
+            if (preview) preview.style.display = 'none';
+            if (placeholder) placeholder.style.display = 'block';
+            setDefaultDate();
         } catch (error) {
-            showToast('Failed to submit item', 'error');
+            console.error('Form submission error:', error);
+            showToast(`Failed to submit item: ${error.message || 'Network error. Is the server running?'}`, 'error');
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
@@ -341,9 +358,9 @@ function initForms() {
     });
 }
 
-function setDefaultDate() {
-    const dateInput = document.getElementById('item-date');
-    if (dateInput) {
+function setDefaultDate(inputId = 'item-date') {
+    const dateInput = document.getElementById(inputId);
+    if (dateInput && !dateInput.value) {
         dateInput.value = new Date().toISOString().split('T')[0];
     }
 }
@@ -496,6 +513,160 @@ function formatDate(dateStr) {
         month: 'short',
         day: 'numeric',
         year: 'numeric'
+    });
+}
+
+// ========================================
+// Sorting
+// ========================================
+
+function initSorting() {
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', (e) => {
+            sortBy = e.target.value;
+            loadItems();
+        });
+    }
+}
+
+// ========================================
+// Dark Mode
+// ========================================
+
+function initDarkMode() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
+    
+    // Check for saved theme preference or default to light mode
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+    }
+}
+
+function updateThemeIcon(theme) {
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+    if (sunIcon && moonIcon) {
+        sunIcon.style.display = theme === 'dark' ? 'none' : 'block';
+        moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
+    }
+}
+
+// ========================================
+// Lost Item Form
+// ========================================
+
+function initLostItemForm() {
+    const lostForm = document.getElementById('lost-form');
+    if (lostForm) {
+        lostForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(lostForm);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/api/lost-items', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showToast('Lost item reported successfully! We will contact you if it\'s found.', 'success');
+                    lostForm.reset();
+                } else {
+                    showToast(result.error || 'Failed to submit report', 'error');
+                }
+            } catch (error) {
+                showToast('Failed to submit report. Please try again.', 'error');
+            }
+        });
+    }
+}
+
+// ========================================
+// Statistics
+// ========================================
+
+async function loadStats() {
+    try {
+        const response = await fetch('/api/stats');
+        const stats = await response.json();
+
+        // Update stat cards
+        const totalEl = document.getElementById('stat-total-found');
+        const claimedEl = document.getElementById('stat-claimed');
+        const rateEl = document.getElementById('stat-success-rate');
+        const monthEl = document.getElementById('stat-this-month');
+        
+        if (totalEl) totalEl.textContent = stats.totalFoundItems || 0;
+        if (claimedEl) claimedEl.textContent = stats.claimedItems || 0;
+        if (rateEl) rateEl.textContent = `${stats.successRate || 0}%`;
+        if (monthEl) monthEl.textContent = stats.itemsThisMonth || 0;
+
+        // Create category chart
+        const ctx = document.getElementById('category-chart');
+        if (ctx && typeof Chart !== 'undefined') {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(stats.categoryCounts || {}),
+                    datasets: [{
+                        data: Object.values(stats.categoryCounts || {}),
+                        backgroundColor: [
+                            '#1e40af',
+                            '#3b82f6',
+                            '#f59e0b',
+                            '#10b981',
+                            '#ef4444',
+                            '#8b5cf6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Failed to load stats:', error);
+    }
+}
+
+// ========================================
+// Mission Page Buttons
+// ========================================
+
+function initMissionButtons() {
+    // Mission page buttons are handled by navigation system via data-page attribute
+    // This function is called when mission page is loaded
+    const missionButtons = document.querySelectorAll('#mission button[data-page]');
+    missionButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const page = btn.getAttribute('data-page');
+            if (page) {
+                navigateTo(page);
+            }
+        });
     });
 }
 
