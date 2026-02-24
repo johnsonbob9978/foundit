@@ -135,7 +135,7 @@ Note: Delete the `foundit.db` file to reset the database with new credentials.
 
 ## Email Notifications
 
-Viking Finder can send email notifications when lost items are matched with found items.
+Viking Vault can send email notifications when lost items are matched with found items.
 
 ### Demo Mode (Default)
 By default, emails are logged to the console for demonstration purposes. This is perfect for the competition as it doesn't require email configuration.
@@ -166,7 +166,7 @@ When a lost item is matched, the owner receives an email with:
 - Details of their lost item
 - Details of the found item
 - Instructions on how to claim the item
-- Link to the Viking Finder website
+- Link to the Viking Vault website
 
 ## License
 

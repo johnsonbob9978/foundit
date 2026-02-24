@@ -51,9 +51,9 @@ async function testEmail() {
         const testEmail = EMAIL_CONFIG.user; // Send to yourself
         
         const info = await transporter.sendMail({
-            from: `"Viking Finder Test" <${EMAIL_CONFIG.from}>`,
+            from: `"Viking Vault Test" <${EMAIL_CONFIG.from}>`,
             to: testEmail,
-            subject: '🧪 Viking Finder Email Test',
+            subject: '🧪 Viking Vault Email Test',
             html: `
                 <h2>Email Test Successful! 🎉</h2>
                 <p>If you're reading this, your email configuration is working correctly.</p>
@@ -63,7 +63,7 @@ async function testEmail() {
                     <li>Port: ${EMAIL_CONFIG.port}</li>
                     <li>From: ${EMAIL_CONFIG.from}</li>
                 </ul>
-                <p>You can now use email notifications in Viking Finder!</p>
+                <p>You can now use email notifications in Viking Vault!</p>
             `,
             text: `
 Email Test Successful! 🎉
@@ -75,7 +75,7 @@ Configuration Details:
 - Port: ${EMAIL_CONFIG.port}
 - From: ${EMAIL_CONFIG.from}
 
-You can now use email notifications in Viking Finder!
+You can now use email notifications in Viking Vault!
             `
         });
         

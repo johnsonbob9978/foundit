@@ -568,7 +568,7 @@ app.post('/api/admin/match-item', (req, res) => {
 async function sendMatchNotificationEmail(lostItem, foundItem) {
     const emailContent = {
         to: lostItem.owner_email,
-        subject: `🎉 Good News! Your Lost Item May Have Been Found - Viking Finder`,
+        subject: `🎉 Good News! Your Lost Item May Have Been Found - Viking Vault`,
         html: `
             <!DOCTYPE html>
             <html>
@@ -613,19 +613,19 @@ async function sendMatchNotificationEmail(lostItem, foundItem) {
                         
                         <p><strong>Next Steps:</strong></p>
                         <ol>
-                            <li>Please visit the Viking Finder website to view the full details</li>
+                            <li>Please visit the Viking Vault website to view the full details</li>
                             <li>If this is your item, you can submit a claim with proof of ownership</li>
                             <li>Once verified, you can pick up your item from the SBHS main office</li>
                         </ol>
                         
                         <p style="text-align: center;">
-                            <a href="${EMAIL_CONFIG.siteUrl}" class="button">View Item on Viking Finder</a>
+                            <a href="${EMAIL_CONFIG.siteUrl}" class="button">View Item on Viking Vault</a>
                         </p>
                         
                         <p>If you have any questions, please contact the SBHS main office.</p>
                         
                         <div class="footer">
-                            <p>Viking Finder - South Brunswick High School</p>
+                            <p>Viking Vault - South Brunswick High School</p>
                             <p>Helping Vikings reunite with their belongings</p>
                         </div>
                     </div>
@@ -651,7 +651,7 @@ Location Found: ${foundItem.location}
 Date Found: ${new Date(foundItem.date_found).toLocaleDateString()}
 
 Next Steps:
-1. Please visit the Viking Finder website to view the full details
+1. Please visit the Viking Vault website to view the full details
 2. If this is your item, you can submit a claim with proof of ownership
 3. Once verified, you can pick up your item from the SBHS main office
 
@@ -659,7 +659,7 @@ Visit: ${EMAIL_CONFIG.siteUrl}
 
 If you have any questions, please contact the SBHS main office.
 
-Viking Finder - South Brunswick High School
+Viking Vault - South Brunswick High School
         `
     };
 
@@ -667,7 +667,7 @@ Viking Finder - South Brunswick High School
     if (emailTransporter) {
         try {
             await emailTransporter.sendMail({
-                from: `"Viking Finder" <${EMAIL_CONFIG.from}>`,
+                from: `"Viking Vault" <${EMAIL_CONFIG.from}>`,
                 ...emailContent
             });
             console.log(`✅ Email sent to ${lostItem.owner_email}`);
@@ -693,7 +693,7 @@ function logEmailForDemo(emailContent) {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`\n🔍 Viking Finder - School Lost & Found`);
+    console.log(`\n🔍 Viking Vault - School Lost & Found`);
     console.log(`   Server running at http://localhost:${PORT}`);
     console.log(`   Admin panel: http://localhost:${PORT}/admin.html`);
     console.log(`   Default admin: username "admin", password "school2024"`);
