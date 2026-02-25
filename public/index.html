@@ -15,7 +15,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="logo" data-page="home">
-                <img src="/images/sbhs.jpeg" alt="SBHS Logo" class="logo-image">
+                <img src="/images/sbhs.jpeg" alt="SBHS Logo" class="logo-image"> 
                 <span class="logo-text">Viking Vault</span>
             </a>
             <ul class="nav-links">
@@ -27,22 +27,6 @@
                 <li><a href="#" data-page="stats" aria-label="View statistics">Stats</a></li>
                 <li><a href="admin.html" class="admin-link" aria-label="Admin panel">Admin</a></li>
             </ul>
-            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
-                <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="5"/>
-                    <line x1="12" y1="1" x2="12" y2="3"/>
-                    <line x1="12" y1="21" x2="12" y2="23"/>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                    <line x1="1" y1="12" x2="3" y2="12"/>
-                    <line x1="21" y1="12" x2="23" y2="12"/>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                </svg>
-                <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
-            </button>
             <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
                 <span></span>
                 <span></span>
@@ -177,71 +161,227 @@
                 <div class="features-header">
                     <span class="section-badge">Powerful Features</span>
                     <h2 class="features-title">Everything you need to <span class="gradient-text">reunite Vikings</span> with their belongings</h2>
-                    <p class="features-subtitle">Discover how Viking Finder transforms lost and found management</p>
+                    <p class="features-subtitle">Discover how Viking Vault transforms lost and found management</p>
                 </div>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-visual">
-                            <div class="feature-card-visual">
-                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-                                    <line x1="12" y1="22.08" x2="12" y2="12"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="feature-text">
-                            <h3>Smart Item Reporting</h3>
-                            <p>Report found items with photos, detailed descriptions, and location data. Our intuitive form makes it easy to document everything accurately.</p>
-                            <ul class="feature-list">
-                                <li>Photo upload with drag & drop</li>
-                                <li>Category-based organization</li>
-                                <li>Location and date tracking</li>
-                                <li>Detailed description fields</li>
-                            </ul>
-                        </div>
+                <div class="features-content-layout">
+                    <div class="features-text">
+                        <p id="typing-text" class="typing-text scroll-animate">Matches lost items with found ones & sends instant email notifications</p>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-visual">
-                            <div class="feature-card-visual">
-                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="11" cy="11" r="8"/>
-                                    <path d="m21 21-4.35-4.35"/>
-                                    <line x1="8" y1="11" x2="14" y2="11"/>
-                                    <line x1="11" y1="8" x2="11" y2="14"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="feature-text">
-                            <h3>Advanced Search & Filter</h3>
-                            <p>Find what you're looking for quickly with powerful search and filtering capabilities. Filter by category, date, location, and more.</p>
-                            <ul class="feature-list">
-                                <li>Real-time search functionality</li>
-                                <li>Category filters</li>
-                                <li>Sort by newest/oldest</li>
-                                <li>Visual item cards</li>
-                            </ul>
-                        </div>
+                    <div class="features-image">
+                        <img src="/images/vikings_care.png" alt="South Brunswick High School Logo" class="features-img">
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-visual">
-                            <div class="feature-card-visual">
-                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                    <polyline points="22,6 12,13 2,6"/>
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Student Reviews Section -->
+        <section class="reviews-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">Student Testimonials</span>
+                    <h2>What Our Students Say</h2>
+                    <p class="section-subtitle">See how Viking Vault has helped students reunite with their belongings</p>
+                </div>
+                <div class="reviews-carousel-wrapper">
+                    <div class="reviews-carousel">
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="review-info">
+                                    <h4 class="review-name">Sarah Chen</h4>
+                                    <p class="review-grade">Class of 2025</p>
+                                </div>
                             </div>
+                            <div class="review-stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <p class="review-text">"I lost my AirPods case during lunch and thought I'd never see it again. Two days later, I got an email that someone found it! Viking Vault made it so easy to get my stuff back. This website is a lifesaver!"</p>
                         </div>
-                        <div class="feature-text">
-                            <h3>Automated Matching System</h3>
-                            <p>Our intelligent system matches lost item reports with found items. When a match is detected, owners receive instant email notifications.</p>
-                            <ul class="feature-list">
-                                <li>AI-powered matching</li>
-                                <li>Email notifications</li>
-                                <li>Admin verification</li>
-                                <li>Complete item history</li>
-                            </ul>
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="review-info">
+                                    <h4 class="review-name">Marcus Rodriguez</h4>
+                                    <p class="review-grade">Class of 2024</p>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <p class="review-text">"As a senior, I've lost track of how many things I've misplaced. Viking Vault's smart matching system found my lost calculator within hours. The email notifications are super helpful - no more checking the website constantly!"</p>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="review-info">
+                                    <h4 class="review-name">Emily Park</h4>
+                                    <p class="review-grade">Class of 2026</p>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <p class="review-text">"I was so stressed when I lost my favorite water bottle. I reported it as lost, and the next day someone had found it! The process was so simple and the admin was really helpful. Love this system!"</p>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="review-info">
+                                    <h4 class="review-name">Jordan Kim</h4>
+                                    <p class="review-grade">Class of 2025</p>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <p class="review-text">"The dark mode feature is awesome, and the website is so easy to use. I found my friend's lost jacket through Viking Vault. It's way better than the old lost and found system. Highly recommend!"</p>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="review-info">
+                                    <h4 class="review-name">Alex Thompson</h4>
+                                    <p class="review-grade">Class of 2024</p>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <p class="review-text">"I lost my keys right before a big game and was panicking. Someone found them and reported it on Viking Vault. Got them back the same day! This website saved me so much stress. Thank you!"</p>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="review-info">
+                                    <h4 class="review-name">Maya Patel</h4>
+                                    <p class="review-grade">Class of 2026</p>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <p class="review-text">"The interface is so clean and modern. I love how you can sort items by newest or oldest. Found my lost notebook in minutes! Viking Vault makes the whole lost and found process actually enjoyable."</p>
+                        </div>
+                        <!-- Duplicate reviews for seamless loop -->
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="review-info">
+                                    <h4 class="review-name">Sarah Chen</h4>
+                                    <p class="review-grade">Class of 2025</p>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <p class="review-text">"I lost my AirPods case during lunch and thought I'd never see it again. Two days later, I got an email that someone found it! Viking Vault made it so easy to get my stuff back. This website is a lifesaver!"</p>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="review-info">
+                                    <h4 class="review-name">Marcus Rodriguez</h4>
+                                    <p class="review-grade">Class of 2024</p>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <p class="review-text">"As a senior, I've lost track of how many things I've misplaced. Viking Vault's smart matching system found my lost calculator within hours. The email notifications are super helpful - no more checking the website constantly!"</p>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div class="review-info">
+                                    <h4 class="review-name">Emily Park</h4>
+                                    <p class="review-grade">Class of 2026</p>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <p class="review-text">"I was so stressed when I lost my favorite water bottle. I reported it as lost, and the next day someone had found it! The process was so simple and the admin was really helpful. Love this system!"</p>
                         </div>
                     </div>
                 </div>
@@ -528,37 +668,60 @@
             <div class="container">
                 <div class="stats-grid" id="stats-grid">
                     <div class="stat-card-large">
-                        <svg class="stat-icon-large" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg class="stat-icon-large" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- Main box -->
                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                             <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
                             <line x1="12" y1="22.08" x2="12" y2="12"/>
+                            <!-- Items inside -->
+                            <circle cx="9" cy="10" r="1.5" fill="currentColor" opacity="0.6"/>
+                            <circle cx="12" cy="10" r="1.5" fill="currentColor" opacity="0.6"/>
+                            <circle cx="15" cy="10" r="1.5" fill="currentColor" opacity="0.6"/>
+                            <rect x="8" y="13" width="8" height="2" rx="1" fill="currentColor" opacity="0.4"/>
                         </svg>
                         <div class="stat-value-large" id="stat-total-found">-</div>
                         <div class="stat-label-large">Items Found</div>
                     </div>
                     <div class="stat-card-large">
-                        <svg class="stat-icon-large" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        <svg class="stat-icon-large" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- Circle -->
+                            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                            <!-- Checkmark -->
+                            <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         <div class="stat-value-large" id="stat-claimed">-</div>
                         <div class="stat-label-large">Items Claimed</div>
                     </div>
                     <div class="stat-card-large">
-                        <svg class="stat-icon-large" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="20" x2="18" y2="10"/>
-                            <line x1="12" y1="20" x2="12" y2="4"/>
-                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        <svg class="stat-icon-large" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- Chart background -->
+                            <rect x="2" y="4" width="20" height="16" rx="2" fill="currentColor" opacity="0.08"/>
+                            <!-- Base line -->
+                            <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" opacity="0.3" stroke-width="1.5"/>
+                            <!-- Upward trending line -->
+                            <polyline points="4,18 8,14 12,10 16,6 20,2" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                            <!-- Upward arrow at the top -->
+                            <path d="M18 4l2-2 2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            <line x1="20" y1="2" x2="20" y2="0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
                         </svg>
                         <div class="stat-value-large" id="stat-success-rate">-</div>
                         <div class="stat-label-large">Success Rate</div>
                     </div>
                     <div class="stat-card-large">
-                        <svg class="stat-icon-large" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                            <line x1="16" y1="2" x2="16" y2="6"/>
-                            <line x1="8" y1="2" x2="8" y2="6"/>
-                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        <svg class="stat-icon-large" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- Calendar base -->
+                            <rect x="3" y="4" width="18" height="18" rx="2" fill="currentColor" opacity="0.08"/>
+                            <!-- Calendar rings -->
+                            <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/>
+                            <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/>
+                            <!-- Header separator -->
+                            <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
+                            <!-- Calendar grid lines -->
+                            <line x1="8" y1="10" x2="8" y2="22" stroke="currentColor" opacity="0.2" stroke-width="1"/>
+                            <line x1="13" y1="10" x2="13" y2="22" stroke="currentColor" opacity="0.2" stroke-width="1"/>
+                            <line x1="18" y1="10" x2="18" y2="22" stroke="currentColor" opacity="0.2" stroke-width="1"/>
+                            <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" opacity="0.2" stroke-width="1"/>
+                            <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" opacity="0.2" stroke-width="1"/>
                         </svg>
                         <div class="stat-value-large" id="stat-this-month">-</div>
                         <div class="stat-label-large">Found This Month</div>
