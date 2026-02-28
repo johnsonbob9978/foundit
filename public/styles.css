@@ -591,109 +591,147 @@ button, input, select, textarea {
     animation: slideUp 0.6s ease 0.3s both;
 }
 
-.hero-visual {
+/* ========================================
+   Hero Orbit Scene
+   ======================================== */
+
+.orbit-scene {
     position: absolute;
-    right: 5%;
     top: 50%;
-    transform: translateY(-50%);
-    width: 400px;
-    height: 400px;
+    left: 70%;
+    transform: translate(-50%, -50%);
+    width: 760px;
+    height: 760px;
+    pointer-events: none;
+    z-index: 0;
 }
 
-.floating-cards {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.float-card {
+/* Circular guide tracks */
+.orbit-track {
     position: absolute;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.orbit-track-1 {
+    width: 270px;
+    height: 270px;
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+    animation: track-spin 50s linear infinite;
+}
+
+.orbit-track-2 {
+    width: 470px;
+    height: 470px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    animation: track-spin 80s linear infinite reverse;
+}
+
+.orbit-track-3 {
+    width: 660px;
+    height: 660px;
+    border: 1px dashed rgba(255, 255, 255, 0.10);
+    animation: track-spin 110s linear infinite;
+}
+
+@keyframes track-spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Central icon */
+.orbit-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.08) 100%);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    padding: var(--spacing-md) var(--spacing-lg);
-    border-radius: var(--radius-xl);
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        0 2px 8px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1.5px solid rgba(255, 255, 255, 0.28);
+    box-shadow:
+        0 0 60px rgba(14, 165, 233, 0.40),
+        0 8px 40px rgba(0, 0, 0, 0.30),
+        inset 0 1px 0 rgba(255,255,255,0.25);
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    animation: floatCard 6s ease-in-out infinite;
-    border: 2px solid rgba(139, 92, 246, 0.3);
-    transition: all var(--transition-base);
-    color: var(--color-text);
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.95);
+    animation: center-glow 3.5s ease-in-out infinite;
 }
 
-.float-card:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 
-        0 12px 40px rgba(139, 92, 246, 0.4),
-        0 4px 12px rgba(0, 0, 0, 0.3),
-        0 0 20px rgba(139, 92, 246, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
-    border-color: var(--color-text-accent);
+@keyframes center-glow {
+    0%, 100% { box-shadow: 0 0 40px rgba(14,165,233,0.35), 0 8px 32px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.25); }
+    50%       { box-shadow: 0 0 65px rgba(14,165,233,0.60), 0 8px 32px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.25); }
 }
 
-.float-card .card-icon {
-    width: 24px;
-    height: 24px;
-    flex-shrink: 0;
-    color: var(--color-primary);
+/* Orbiting item bubbles */
+.orb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -36px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 100%);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    opacity: 0.85;
 }
 
-.float-card .card-text {
-    font-weight: 600;
-    color: var(--color-text);
+/* ---- Orbit keyframes ----
+   transform: rotate(A) translateX(R) rotate(-A)
+   A = orbit angle (drives revolution)
+   R = orbit radius (fixed)
+   -A = counter-rotation (keeps item upright)       ---- */
+
+/* Ring 1: radius 135px — clockwise, 16s */
+@keyframes orbit-r1-cw {
+    from { transform: rotate(  0deg) translateX(135px) rotate(  0deg); }
+    to   { transform: rotate(360deg) translateX(135px) rotate(-360deg); }
 }
 
-.float-card .card-status {
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
+/* Ring 2: radius 235px — counter-clockwise, 26s */
+@keyframes orbit-r2-ccw {
+    from { transform: rotate(   0deg) translateX(235px) rotate(   0deg); }
+    to   { transform: rotate(-360deg) translateX(235px) rotate( 360deg); }
 }
 
-.card-status.found {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--color-success);
+/* Ring 3: radius 330px — clockwise, 38s */
+@keyframes orbit-r3-cw {
+    from { transform: rotate(  0deg) translateX(330px) rotate(  0deg); }
+    to   { transform: rotate(360deg) translateX(330px) rotate(-360deg); }
 }
 
-.card-status.claimed {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--color-accent);
-}
+/* ---- Ring 1: 3 items, 120° apart (16s ÷ 3 = 5.33s) ---- */
+.orb-r1-a { animation: orbit-r1-cw  16s linear infinite; animation-delay:    0s; }
+.orb-r1-b { animation: orbit-r1-cw  16s linear infinite; animation-delay: -5.33s; }
+.orb-r1-c { animation: orbit-r1-cw  16s linear infinite; animation-delay:-10.67s; }
 
-.card-1 {
-    top: 10%;
-    left: 10%;
-    animation-delay: 0s;
-}
+/* ---- Ring 2: 4 items, 90° apart (26s ÷ 4 = 6.5s) ---- */
+.orb-r2-a { animation: orbit-r2-ccw 26s linear infinite; animation-delay:   0s; }
+.orb-r2-b { animation: orbit-r2-ccw 26s linear infinite; animation-delay: -6.5s; }
+.orb-r2-c { animation: orbit-r2-ccw 26s linear infinite; animation-delay:-13.0s; }
+.orb-r2-d { animation: orbit-r2-ccw 26s linear infinite; animation-delay:-19.5s; }
 
-.card-2 {
-    top: 35%;
-    right: 5%;
-    animation-delay: 1s;
-}
-
-.card-3 {
-    bottom: 35%;
-    left: 5%;
-    animation-delay: 2s;
-}
-
-.card-4 {
-    bottom: 10%;
-    right: 15%;
-    animation-delay: 1.5s;
-}
-
-@keyframes floatCard {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-}
+/* ---- Ring 3: 5 items, 72° apart (38s ÷ 5 = 7.6s) ---- */
+.orb-r3-a { animation: orbit-r3-cw  38s linear infinite; animation-delay:   0s; }
+.orb-r3-b { animation: orbit-r3-cw  38s linear infinite; animation-delay: -7.6s; }
+.orb-r3-c { animation: orbit-r3-cw  38s linear infinite; animation-delay:-15.2s; }
+.orb-r3-d { animation: orbit-r3-cw  38s linear infinite; animation-delay:-22.8s; }
+.orb-r3-e { animation: orbit-r3-cw  38s linear infinite; animation-delay:-30.4s; }
 
 /* ========================================
    Buttons
@@ -2823,12 +2861,13 @@ button, input, select, textarea {
    ======================================== */
 
 @media (max-width: 1024px) {
-    .hero-visual {
-        display: none;
-    }
-    
     .hero-content {
         max-width: 100%;
+    }
+
+    /* Hide orbit on smaller screens where it would overlap the text */
+    .orbit-scene {
+        display: none;
     }
 }
 

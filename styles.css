@@ -344,6 +344,8 @@ button, input, select, textarea {
 
 .hero-content {
     max-width: 600px;
+    position: relative;
+    z-index: 2;
 }
 
 .hero-badge {
@@ -397,87 +399,158 @@ button, input, select, textarea {
     animation: slideUp 0.6s ease 0.3s both;
 }
 
-.hero-visual {
+/* ========================================
+   Hero Floating Background Cards
+   ======================================== */
+
+.hero-floating-bg {
     position: absolute;
-    right: 5%;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 400px;
-    height: 400px;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
 }
 
-.floating-cards {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.float-card {
+.fc {
     position: absolute;
     background: var(--color-surface);
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: 13px 18px;
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.09);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    animation: floatCard 6s ease-in-out infinite;
+    gap: 11px;
+    white-space: nowrap;
+    opacity: 0;
 }
 
-.float-card .card-icon {
+.fc-icon {
     font-size: 1.5rem;
+    line-height: 1;
 }
 
-.float-card .card-text {
+.fc-label {
     font-weight: 600;
+    font-size: 0.92rem;
     color: var(--color-text);
 }
 
-.float-card .card-status {
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    padding: 2px 8px;
+.fc-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 9px;
     border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
-.card-status.found {
-    background: rgba(16, 185, 129, 0.1);
+.fc-badge.found {
+    background: rgba(16, 185, 129, 0.12);
     color: var(--color-success);
 }
 
-.card-status.claimed {
-    background: rgba(245, 158, 11, 0.1);
+.fc-badge.claimed {
+    background: rgba(245, 158, 11, 0.12);
     color: var(--color-accent);
 }
 
-.card-1 {
-    top: 10%;
-    left: 10%;
-    animation-delay: 0s;
+/* ---- Drift keyframes ---- */
+
+/* Left → Right across screen */
+@keyframes fc-lr {
+    0%   { transform: translate(-300px, 0px)   rotate(-6deg); opacity: 0; }
+    8%   { opacity: 0.72; }
+    50%  { transform: translate(45vw, -40px)   rotate(2deg);  opacity: 0.72; }
+    92%  { opacity: 0.72; }
+    100% { transform: translate(110vw, 20px)   rotate(6deg);  opacity: 0; }
 }
 
-.card-2 {
-    top: 35%;
-    right: 5%;
-    animation-delay: 1s;
+/* Right → Left across screen */
+@keyframes fc-rl {
+    0%   { transform: translate(110vw, 0px)    rotate(6deg);  opacity: 0; }
+    8%   { opacity: 0.72; }
+    50%  { transform: translate(45vw, 35px)    rotate(-2deg); opacity: 0.72; }
+    92%  { opacity: 0.72; }
+    100% { transform: translate(-300px, -20px) rotate(-6deg); opacity: 0; }
 }
 
-.card-3 {
-    bottom: 35%;
-    left: 5%;
-    animation-delay: 2s;
+/* Left → Right, lower arc */
+@keyframes fc-lr-arc {
+    0%   { transform: translate(-300px, 0px)   rotate(5deg);  opacity: 0; }
+    8%   { opacity: 0.65; }
+    35%  { transform: translate(28vw, 50px)    rotate(-2deg); opacity: 0.65; }
+    70%  { transform: translate(72vw, -20px)   rotate(3deg);  opacity: 0.65; }
+    92%  { opacity: 0.65; }
+    100% { transform: translate(110vw, 30px)   rotate(-5deg); opacity: 0; }
 }
 
-.card-4 {
-    bottom: 10%;
-    right: 15%;
-    animation-delay: 1.5s;
+/* Right → Left, upper arc */
+@keyframes fc-rl-arc {
+    0%   { transform: translate(110vw, 0px)    rotate(-5deg); opacity: 0; }
+    8%   { opacity: 0.65; }
+    35%  { transform: translate(72vw, -50px)   rotate(2deg);  opacity: 0.65; }
+    70%  { transform: translate(28vw, 20px)    rotate(-3deg); opacity: 0.65; }
+    92%  { opacity: 0.65; }
+    100% { transform: translate(-300px, 30px)  rotate(5deg);  opacity: 0; }
 }
 
-@keyframes floatCard {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
+/* Diagonal: bottom-left → top-right */
+@keyframes fc-diag-tr {
+    0%   { transform: translate(-260px, 180px)   rotate(-5deg); opacity: 0; }
+    8%   { opacity: 0.68; }
+    92%  { opacity: 0.68; }
+    100% { transform: translate(110vw, -220px)   rotate(5deg);  opacity: 0; }
 }
+
+/* Diagonal: top-left → bottom-right */
+@keyframes fc-diag-br {
+    0%   { transform: translate(-260px, -180px)  rotate(5deg);  opacity: 0; }
+    8%   { opacity: 0.68; }
+    92%  { opacity: 0.68; }
+    100% { transform: translate(110vw, 220px)    rotate(-5deg); opacity: 0; }
+}
+
+/* Bobbing wave (stays in view, larger excursions) */
+@keyframes fc-wave {
+    0%   { transform: translate(0px,   0px)   rotate(-3deg); }
+    20%  { transform: translate(70px,  -55px) rotate(4deg);  }
+    40%  { transform: translate(-45px, -80px) rotate(-4deg); }
+    60%  { transform: translate(90px,  -25px) rotate(3deg);  }
+    80%  { transform: translate(-25px,  35px) rotate(-2deg); }
+    100% { transform: translate(0px,   0px)   rotate(-3deg); }
+}
+
+/* Slow meander (stays in view) */
+@keyframes fc-meander {
+    0%   { transform: translate(0px,    0px)   rotate(2deg);  }
+    12%  { transform: translate(-70px, -60px)  rotate(-3deg); }
+    25%  { transform: translate(80px,  -100px) rotate(4deg);  }
+    38%  { transform: translate(110px, -15px)  rotate(-2deg); }
+    50%  { transform: translate(55px,   70px)  rotate(3deg);  }
+    62%  { transform: translate(-50px,  90px)  rotate(-4deg); }
+    75%  { transform: translate(-105px, 25px)  rotate(3deg);  }
+    88%  { transform: translate(-55px, -45px)  rotate(-2deg); }
+    100% { transform: translate(0px,    0px)   rotate(2deg);  }
+}
+
+/* ---- Individual card placement & animation ---- */
+
+/* Traversal cards (opacity handled entirely by animation) */
+.fc-1  { top: 11%; left: 0; animation: fc-lr      22s linear       infinite both; animation-delay:  0s;  }
+.fc-2  { top: 67%; left: 0; animation: fc-rl      26s linear       infinite both; animation-delay:  3s;  }
+.fc-3  { top: 32%; left: 0; animation: fc-lr-arc  29s linear       infinite both; animation-delay:  8s;  }
+.fc-4  { top: 80%; left: 0; animation: fc-rl-arc  21s linear       infinite both; animation-delay: 14s;  }
+.fc-5  { top: 50%; left: 0; animation: fc-lr      25s linear       infinite both; animation-delay: 11s;  }
+.fc-6  { top: 20%; left: 0; animation: fc-rl      19s linear       infinite both; animation-delay:  5s;  }
+.fc-7  { top:  4%; left: 0; animation: fc-diag-tr 32s linear       infinite both; animation-delay:  1s;  }
+.fc-8  { top: 88%; left: 0; animation: fc-diag-br 28s linear       infinite both; animation-delay: 10s;  }
+
+/* Bobbing cards (always visible, opacity set directly) */
+.fc-9  { top: 17%; left: 17%; animation: fc-wave    17s ease-in-out infinite; animation-delay:  2s; opacity: 0.68; }
+.fc-10 { top: 58%; left: 64%; animation: fc-wave    19s ease-in-out infinite; animation-delay:  7s; opacity: 0.68; }
+.fc-11 { top: 40%; left: 38%; animation: fc-meander 23s ease-in-out infinite; animation-delay:  4s; opacity: 0.65; }
+.fc-12 { top: 74%; left: 52%; animation: fc-meander 26s ease-in-out infinite; animation-delay:  9s; opacity: 0.65; }
 
 /* ========================================
    Buttons
@@ -1360,12 +1433,13 @@ button, input, select, textarea {
    ======================================== */
 
 @media (max-width: 1024px) {
-    .hero-visual {
-        display: none;
-    }
-    
     .hero-content {
         max-width: 100%;
+    }
+
+    /* Reduce number of visible bobbing cards on smaller screens */
+    .fc-11, .fc-12 {
+        display: none;
     }
 }
 

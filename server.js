@@ -1,15 +1,44 @@
-const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
-const nodemailer = require('nodemailer');
+import { initializeApp } from 'firebase/app';
+import {
+    getFirestore,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    setDoc,
+    updateDoc,
+    deleteDoc
+} from 'firebase/firestore';
+import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
+import nodemailer from 'nodemailer';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDk7F8oWz3NI-Ikd8crh0mWGdAZLhdC6fU",
+    authDomain: "viking-vault-c8c2a.firebaseapp.com",
+    projectId: "viking-vault-c8c2a",
+    storageBucket: "viking-vault-c8c2a.firebasestorage.app",
+    messagingSenderId: "182969920672",
+    appId: "1:182969920672:web:10656fccf940951ba42dc5",
+    measurementId: "G-M5RWRJH460"
+};
+
+// Initialize Firebase (Analytics is browser-only, not used on server)
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
 
 // Email configuration - loaded from email.config.json
-// For demo/competition: Set "enabled" to false to log emails to console
 const EMAIL_CONFIG_PATH = path.join(__dirname, 'email.config.json');
 let EMAIL_CONFIG = {
     enabled: false,
@@ -19,10 +48,9 @@ let EMAIL_CONFIG = {
     user: '',
     password: '',
     from: 'vikingfinder@sbhs.edu',
-    siteUrl: 'http://localhost:3000'
+    siteUrl: 'http://localhost:3001'
 };
 
-// Load email config from file if it exists
 if (fs.existsSync(EMAIL_CONFIG_PATH)) {
     try {
         const configFile = fs.readFileSync(EMAIL_CONFIG_PATH, 'utf8');
@@ -32,12 +60,9 @@ if (fs.existsSync(EMAIL_CONFIG_PATH)) {
     }
 }
 
-// Create email transporter (or null if not configured)
 let emailTransporter = null;
 if (EMAIL_CONFIG.enabled && EMAIL_CONFIG.user && EMAIL_CONFIG.password) {
-    // Remove spaces from password (Gmail app passwords often have spaces)
     const cleanPassword = EMAIL_CONFIG.password.replace(/\s+/g, '');
-    
     emailTransporter = nodemailer.createTransport({
         host: EMAIL_CONFIG.host,
         port: EMAIL_CONFIG.port,
@@ -49,54 +74,61 @@ if (EMAIL_CONFIG.enabled && EMAIL_CONFIG.user && EMAIL_CONFIG.password) {
     });
 }
 
-// Data file paths
-const DATA_DIR = path.join(__dirname, 'data');
-const ITEMS_FILE = path.join(DATA_DIR, 'items.json');
-const CLAIMS_FILE = path.join(DATA_DIR, 'claims.json');
-const ADMIN_FILE = path.join(DATA_DIR, 'admin.json');
-
-// Create directories if they don't exist
+// Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
-if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+
+// ========================================
+// Firestore Helper Functions
+// ========================================
+
+async function getCollection(collectionName) {
+    const snapshot = await getDocs(collection(db, collectionName));
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// Initialize data files
-function initDataFiles() {
-    if (!fs.existsSync(ITEMS_FILE)) {
-        fs.writeFileSync(ITEMS_FILE, JSON.stringify([], null, 2));
-    }
-    if (!fs.existsSync(CLAIMS_FILE)) {
-        fs.writeFileSync(CLAIMS_FILE, JSON.stringify([], null, 2));
-    }
-    if (!fs.existsSync(ADMIN_FILE)) {
-        fs.writeFileSync(ADMIN_FILE, JSON.stringify({ username: 'admin', password: 'school2024' }, null, 2));
-    }
+async function getDocument(collectionName, id) {
+    const snap = await getDoc(doc(db, collectionName, id));
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...snap.data() };
 }
-initDataFiles();
 
-// Data helpers
-function readData(file) {
+async function setDocument(collectionName, id, data) {
+    await setDoc(doc(db, collectionName, id), data);
+}
+
+async function updateDocument(collectionName, id, data) {
+    await updateDoc(doc(db, collectionName, id), data);
+}
+
+async function deleteDocument(collectionName, id) {
+    await deleteDoc(doc(db, collectionName, id));
+}
+
+// Seed admin credentials in Firestore on first run
+async function initAdminCredentials() {
     try {
-        return JSON.parse(fs.readFileSync(file, 'utf8'));
-    } catch {
-        return file === ADMIN_FILE ? { username: 'admin', password: 'school2024' } : [];
+        const adminSnap = await getDoc(doc(db, 'config', 'admin'));
+        if (!adminSnap.exists()) {
+            await setDoc(doc(db, 'config', 'admin'), { username: 'admin', password: 'school2024' });
+            console.log('✅ Admin credentials initialized in Firestore');
+        }
+    } catch (error) {
+        console.error('⚠️  Could not initialize admin credentials:', error.message);
     }
 }
 
-function writeData(file, data) {
-    fs.writeFileSync(file, JSON.stringify(data, null, 2));
-}
-
+// ========================================
 // Middleware
+// ========================================
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Configure multer for file uploads
+// Configure multer for file uploads (photos stay on disk)
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, uploadsDir);
@@ -109,7 +141,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         const allowedTypes = /jpeg|jpg|png|gif|webp/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -122,443 +154,454 @@ const upload = multer({
     }
 });
 
+// ========================================
 // API Routes
+// ========================================
 
-// Get all approved items (for public listing)
-app.get('/api/items', (req, res) => {
-    const { search, category, sort } = req.query;
-    let items = readData(ITEMS_FILE).filter(item => item.status === 'approved');
+// Get all approved items (public listing)
+app.get('/api/items', async (req, res) => {
+    try {
+        const { search, category, sort } = req.query;
+        let items = (await getCollection('items')).filter(item => item.status === 'approved');
 
-    if (category && category !== 'all') {
-        items = items.filter(item => item.category === category);
+        if (category && category !== 'all') {
+            items = items.filter(item => item.category === category);
+        }
+
+        if (search) {
+            const searchLower = search.toLowerCase();
+            items = items.filter(item =>
+                item.title.toLowerCase().includes(searchLower) ||
+                (item.description && item.description.toLowerCase().includes(searchLower)) ||
+                item.location.toLowerCase().includes(searchLower)
+            );
+        }
+
+        if (sort === 'oldest') {
+            items.sort((a, b) => new Date(a.date_found) - new Date(b.date_found));
+        } else {
+            items.sort((a, b) => new Date(b.date_found) - new Date(a.date_found));
+        }
+
+        res.json(items);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch items' });
     }
-
-    if (search) {
-        const searchLower = search.toLowerCase();
-        items = items.filter(item => 
-            item.title.toLowerCase().includes(searchLower) ||
-            (item.description && item.description.toLowerCase().includes(searchLower)) ||
-            item.location.toLowerCase().includes(searchLower)
-        );
-    }
-
-    // Sort by date_found
-    if (sort === 'oldest') {
-        items.sort((a, b) => new Date(a.date_found) - new Date(b.date_found));
-    } else {
-        // Default: newest first
-        items.sort((a, b) => new Date(b.date_found) - new Date(a.date_found));
-    }
-
-    res.json(items);
 });
 
 // Get single item
-app.get('/api/items/:id', (req, res) => {
-    const items = readData(ITEMS_FILE);
-    const item = items.find(i => i.id === req.params.id);
-    if (!item) {
-        return res.status(404).json({ error: 'Item not found' });
+app.get('/api/items/:id', async (req, res) => {
+    try {
+        const item = await getDocument('items', req.params.id);
+        if (!item) return res.status(404).json({ error: 'Item not found' });
+        res.json(item);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch item' });
     }
-    res.json(item);
 });
 
 // Submit a found item
-app.post('/api/items', upload.single('photo'), (req, res) => {
-    const { title, description, category, location, date_found, finder_name, finder_email, finder_phone } = req.body;
+app.post('/api/items', upload.single('photo'), async (req, res) => {
+    try {
+        const { title, description, category, location, date_found, finder_name, finder_email, finder_phone } = req.body;
 
-    if (!title || !category || !location || !date_found || !finder_name || !finder_email) {
-        return res.status(400).json({ error: 'Missing required fields' });
+        if (!title || !category || !location || !date_found || !finder_name || !finder_email) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const id = uuidv4();
+        const newItem = {
+            id,
+            title,
+            description: description || '',
+            category,
+            location,
+            date_found,
+            finder_name,
+            finder_email,
+            finder_phone: finder_phone || '',
+            photo: req.file ? `/uploads/${req.file.filename}` : null,
+            status: 'pending',
+            created_at: new Date().toISOString(),
+            history: [{
+                action: 'found',
+                timestamp: new Date().toISOString(),
+                by: finder_name,
+                email: finder_email,
+                details: `Found at ${location} on ${date_found}`
+            }]
+        };
+
+        await setDocument('items', id, newItem);
+        res.status(201).json({ message: 'Item submitted successfully! It will appear after admin approval.', id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to submit item' });
     }
-
-    const items = readData(ITEMS_FILE);
-    const newItem = {
-        id: uuidv4(),
-        title,
-        description: description || '',
-        category,
-        location,
-        date_found,
-        finder_name,
-        finder_email,
-        finder_phone: finder_phone || '',
-        photo: req.file ? `/uploads/${req.file.filename}` : null,
-        status: 'pending',
-        created_at: new Date().toISOString(),
-        history: [{
-            action: 'found',
-            timestamp: new Date().toISOString(),
-            by: finder_name,
-            email: finder_email,
-            details: `Found at ${location} on ${date_found}`
-        }]
-    };
-
-    items.push(newItem);
-    writeData(ITEMS_FILE, items);
-
-    res.status(201).json({ message: 'Item submitted successfully! It will appear after admin approval.', id: newItem.id });
 });
 
 // Submit a claim
-app.post('/api/claims', (req, res) => {
-    const { item_id, claimant_name, claimant_email, claimant_phone, description } = req.body;
+app.post('/api/claims', async (req, res) => {
+    try {
+        const { item_id, claimant_name, claimant_email, claimant_phone, description } = req.body;
 
-    if (!item_id || !claimant_name || !claimant_email || !description) {
-        return res.status(400).json({ error: 'Missing required fields' });
+        if (!item_id || !claimant_name || !claimant_email || !description) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const id = uuidv4();
+        const newClaim = {
+            id,
+            item_id,
+            claimant_name,
+            claimant_email,
+            claimant_phone: claimant_phone || '',
+            description,
+            status: 'pending',
+            created_at: new Date().toISOString()
+        };
+
+        await setDocument('claims', id, newClaim);
+
+        // Append to item history
+        const item = await getDocument('items', item_id);
+        if (item) {
+            const history = item.history || [];
+            history.push({
+                action: 'claim_submitted',
+                timestamp: new Date().toISOString(),
+                by: claimant_name,
+                email: claimant_email,
+                details: `Claim submitted: ${description.substring(0, 50)}...`
+            });
+            await updateDocument('items', item_id, { history });
+        }
+
+        res.status(201).json({ message: 'Claim submitted successfully! We will contact you soon.', id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to submit claim' });
     }
-
-    const claims = readData(CLAIMS_FILE);
-    const items = readData(ITEMS_FILE);
-    const newClaim = {
-        id: uuidv4(),
-        item_id,
-        claimant_name,
-        claimant_email,
-        claimant_phone: claimant_phone || '',
-        description,
-        status: 'pending',
-        created_at: new Date().toISOString()
-    };
-
-    claims.push(newClaim);
-    writeData(CLAIMS_FILE, claims);
-
-    // Add to item history
-    const itemIndex = items.findIndex(i => i.id === item_id);
-    if (itemIndex !== -1) {
-        if (!items[itemIndex].history) items[itemIndex].history = [];
-        items[itemIndex].history.push({
-            action: 'claim_submitted',
-            timestamp: new Date().toISOString(),
-            by: claimant_name,
-            email: claimant_email,
-            details: `Claim submitted: ${description.substring(0, 50)}...`
-        });
-        writeData(ITEMS_FILE, items);
-    }
-
-    res.status(201).json({ message: 'Claim submitted successfully! We will contact you soon.', id: newClaim.id });
 });
 
 // Submit a lost item (reverse claim)
-app.post('/api/lost-items', (req, res) => {
-    const { title, description, category, location_lost, date_lost, owner_name, owner_email, owner_phone } = req.body;
+app.post('/api/lost-items', async (req, res) => {
+    try {
+        const { title, description, category, location_lost, date_lost, owner_name, owner_email, owner_phone } = req.body;
 
-    if (!title || !category || !location_lost || !date_lost || !owner_name || !owner_email) {
-        return res.status(400).json({ error: 'Missing required fields' });
+        if (!title || !category || !location_lost || !date_lost || !owner_name || !owner_email) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const id = uuidv4();
+        const newLostItem = {
+            id,
+            title,
+            description: description || '',
+            category,
+            location_lost,
+            date_lost,
+            owner_name,
+            owner_email,
+            owner_phone: owner_phone || '',
+            status: 'active',
+            created_at: new Date().toISOString(),
+            matched_item_id: null
+        };
+
+        await setDocument('lostItems', id, newLostItem);
+        res.status(201).json({ message: "Lost item reported successfully! We will contact you if it's found.", id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to report lost item' });
     }
-
-    const LOST_ITEMS_FILE = path.join(DATA_DIR, 'lost-items.json');
-    if (!fs.existsSync(LOST_ITEMS_FILE)) {
-        fs.writeFileSync(LOST_ITEMS_FILE, JSON.stringify([], null, 2));
-    }
-
-    const lostItems = readData(LOST_ITEMS_FILE);
-    const newLostItem = {
-        id: uuidv4(),
-        title,
-        description: description || '',
-        category,
-        location_lost,
-        date_lost,
-        owner_name,
-        owner_email,
-        owner_phone: owner_phone || '',
-        status: 'active',
-        created_at: new Date().toISOString(),
-        matched_item_id: null
-    };
-
-    lostItems.push(newLostItem);
-    writeData(LOST_ITEMS_FILE, lostItems);
-
-    res.status(201).json({ message: 'Lost item reported successfully! We will contact you if it\'s found.', id: newLostItem.id });
 });
 
 // Admin authentication
-app.post('/api/admin/login', (req, res) => {
-    const { username, password } = req.body;
-    const admin = readData(ADMIN_FILE);
+app.post('/api/admin/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const admin = await getDocument('config', 'admin');
 
-    if (admin.username === username && admin.password === password) {
-        res.json({ success: true, message: 'Login successful' });
-    } else {
-        res.status(401).json({ success: false, error: 'Invalid credentials' });
+        if (admin && admin.username === username && admin.password === password) {
+            res.json({ success: true, message: 'Login successful' });
+        } else {
+            res.status(401).json({ success: false, error: 'Invalid credentials' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Login failed' });
     }
 });
 
 // Get all items (admin)
-app.get('/api/admin/items', (req, res) => {
-    const { status } = req.query;
-    let items = readData(ITEMS_FILE);
+app.get('/api/admin/items', async (req, res) => {
+    try {
+        const { status } = req.query;
+        let items = await getCollection('items');
 
-    if (status && status !== 'all') {
-        items = items.filter(item => item.status === status);
+        if (status && status !== 'all') {
+            items = items.filter(item => item.status === status);
+        }
+
+        items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        res.json(items);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch items' });
     }
-
-    // Sort by created_at descending
-    items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-    res.json(items);
 });
 
 // Update item status (admin)
-app.patch('/api/admin/items/:id', (req, res) => {
-    const { status, admin_name } = req.body;
-    const { id } = req.params;
+app.patch('/api/admin/items/:id', async (req, res) => {
+    try {
+        const { status, admin_name } = req.body;
+        const { id } = req.params;
 
-    if (!['pending', 'approved', 'claimed', 'rejected'].includes(status)) {
-        return res.status(400).json({ error: 'Invalid status' });
-    }
+        if (!['pending', 'approved', 'claimed', 'rejected'].includes(status)) {
+            return res.status(400).json({ error: 'Invalid status' });
+        }
 
-    const items = readData(ITEMS_FILE);
-    const itemIndex = items.findIndex(i => i.id === id);
+        const item = await getDocument('items', id);
+        if (!item) return res.status(404).json({ error: 'Item not found' });
 
-    if (itemIndex === -1) {
-        return res.status(404).json({ error: 'Item not found' });
-    }
-
-    const oldStatus = items[itemIndex].status;
-    items[itemIndex].status = status;
-    
-    // Track history
-    if (!items[itemIndex].history) items[itemIndex].history = [];
-    items[itemIndex].history.push({
-        action: 'status_changed',
-        timestamp: new Date().toISOString(),
-        by: admin_name || 'Admin',
-        details: `Status changed from ${oldStatus} to ${status}`
-    });
-
-    // If approved, track approval
-    if (status === 'approved' && oldStatus === 'pending') {
-        items[itemIndex].history.push({
-            action: 'approved',
+        const oldStatus = item.status;
+        const history = item.history || [];
+        history.push({
+            action: 'status_changed',
             timestamp: new Date().toISOString(),
             by: admin_name || 'Admin',
-            details: 'Item approved and made public'
+            details: `Status changed from ${oldStatus} to ${status}`
         });
+
+        if (status === 'approved' && oldStatus === 'pending') {
+            history.push({
+                action: 'approved',
+                timestamp: new Date().toISOString(),
+                by: admin_name || 'Admin',
+                details: 'Item approved and made public'
+            });
+        }
+
+        await updateDocument('items', id, { status, history });
+        res.json({ message: 'Item status updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to update item' });
     }
-
-    writeData(ITEMS_FILE, items);
-
-    res.json({ message: 'Item status updated successfully' });
 });
 
 // Delete item (admin)
-app.delete('/api/admin/items/:id', (req, res) => {
-    const { id } = req.params;
-    const items = readData(ITEMS_FILE);
-    const itemIndex = items.findIndex(i => i.id === id);
+app.delete('/api/admin/items/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const item = await getDocument('items', id);
 
-    if (itemIndex === -1) {
-        return res.status(404).json({ error: 'Item not found' });
-    }
+        if (!item) return res.status(404).json({ error: 'Item not found' });
 
-    // Delete associated photo
-    const item = items[itemIndex];
-    if (item.photo) {
-        const photoPath = path.join(__dirname, 'public', item.photo);
-        if (fs.existsSync(photoPath)) {
-            fs.unlinkSync(photoPath);
+        // Delete associated photo from disk
+        if (item.photo) {
+            const photoPath = path.join(__dirname, 'public', item.photo);
+            if (fs.existsSync(photoPath)) {
+                fs.unlinkSync(photoPath);
+            }
         }
+
+        // Delete all claims linked to this item
+        const claims = await getCollection('claims');
+        await Promise.all(
+            claims.filter(c => c.item_id === id).map(c => deleteDocument('claims', c.id))
+        );
+
+        await deleteDocument('items', id);
+        res.json({ message: 'Item deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to delete item' });
     }
-
-    // Remove claims for this item
-    const claims = readData(CLAIMS_FILE);
-    const updatedClaims = claims.filter(c => c.item_id !== id);
-    writeData(CLAIMS_FILE, updatedClaims);
-
-    // Remove item
-    items.splice(itemIndex, 1);
-    writeData(ITEMS_FILE, items);
-
-    res.json({ message: 'Item deleted successfully' });
 });
 
 // Get all claims (admin)
-app.get('/api/admin/claims', (req, res) => {
-    const claims = readData(CLAIMS_FILE);
-    const items = readData(ITEMS_FILE);
+app.get('/api/admin/claims', async (req, res) => {
+    try {
+        const [claims, items] = await Promise.all([
+            getCollection('claims'),
+            getCollection('items')
+        ]);
 
-    // Add item title to each claim
-    const claimsWithItems = claims.map(claim => {
-        const item = items.find(i => i.id === claim.item_id);
-        return {
-            ...claim,
-            item_title: item ? item.title : 'Unknown Item'
-        };
-    });
+        const claimsWithItems = claims.map(claim => {
+            const item = items.find(i => i.id === claim.item_id);
+            return { ...claim, item_title: item ? item.title : 'Unknown Item' };
+        });
 
-    // Sort by created_at descending
-    claimsWithItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-    res.json(claimsWithItems);
+        claimsWithItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        res.json(claimsWithItems);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch claims' });
+    }
 });
 
 // Update claim status (admin)
-app.patch('/api/admin/claims/:id', (req, res) => {
-    const { status, admin_name } = req.body;
-    const { id } = req.params;
+app.patch('/api/admin/claims/:id', async (req, res) => {
+    try {
+        const { status, admin_name } = req.body;
+        const { id } = req.params;
 
-    if (!['pending', 'approved', 'rejected'].includes(status)) {
-        return res.status(400).json({ error: 'Invalid status' });
-    }
-
-    const claims = readData(CLAIMS_FILE);
-    const claimIndex = claims.findIndex(c => c.id === id);
-
-    if (claimIndex === -1) {
-        return res.status(404).json({ error: 'Claim not found' });
-    }
-
-    const oldStatus = claims[claimIndex].status;
-    claims[claimIndex].status = status;
-    writeData(CLAIMS_FILE, claims);
-
-    // If claim is approved, mark item as claimed and track history
-    if (status === 'approved') {
-        const items = readData(ITEMS_FILE);
-        const itemIndex = items.findIndex(i => i.id === claims[claimIndex].item_id);
-        if (itemIndex !== -1) {
-            items[itemIndex].status = 'claimed';
-            if (!items[itemIndex].history) items[itemIndex].history = [];
-            items[itemIndex].history.push({
-                action: 'claimed',
-                timestamp: new Date().toISOString(),
-                by: claims[claimIndex].claimant_name,
-                email: claims[claimIndex].claimant_email,
-                details: `Item claimed by ${claims[claimIndex].claimant_name}. Approved by ${admin_name || 'Admin'}`
-            });
-            writeData(ITEMS_FILE, items);
+        if (!['pending', 'approved', 'rejected'].includes(status)) {
+            return res.status(400).json({ error: 'Invalid status' });
         }
-    }
 
-    res.json({ message: 'Claim status updated successfully' });
+        const claim = await getDocument('claims', id);
+        if (!claim) return res.status(404).json({ error: 'Claim not found' });
+
+        await updateDocument('claims', id, { status });
+
+        // If claim approved, mark the item as claimed and record history
+        if (status === 'approved') {
+            const item = await getDocument('items', claim.item_id);
+            if (item) {
+                const history = item.history || [];
+                history.push({
+                    action: 'claimed',
+                    timestamp: new Date().toISOString(),
+                    by: claim.claimant_name,
+                    email: claim.claimant_email,
+                    details: `Item claimed by ${claim.claimant_name}. Approved by ${admin_name || 'Admin'}`
+                });
+                await updateDocument('items', claim.item_id, { status: 'claimed', history });
+            }
+        }
+
+        res.json({ message: 'Claim status updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to update claim' });
+    }
 });
 
 // Get dashboard stats (admin)
-app.get('/api/admin/stats', (req, res) => {
-    const items = readData(ITEMS_FILE);
-    const claims = readData(CLAIMS_FILE);
-    const LOST_ITEMS_FILE = path.join(DATA_DIR, 'lost-items.json');
-    const lostItems = fs.existsSync(LOST_ITEMS_FILE) ? readData(LOST_ITEMS_FILE) : [];
+app.get('/api/admin/stats', async (req, res) => {
+    try {
+        const [items, claims, lostItems] = await Promise.all([
+            getCollection('items'),
+            getCollection('claims'),
+            getCollection('lostItems')
+        ]);
 
-    // Category breakdown
-    const categoryCounts = {};
-    items.forEach(item => {
-        categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
-    });
+        const categoryCounts = {};
+        items.forEach(item => {
+            categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
+        });
 
-    // Items over time (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const recentItems = items.filter(item => new Date(item.created_at) >= thirtyDaysAgo);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const recentItems = items.filter(item => new Date(item.created_at) >= thirtyDaysAgo);
 
-    res.json({
-        totalItems: items.length,
-        pendingItems: items.filter(i => i.status === 'pending').length,
-        approvedItems: items.filter(i => i.status === 'approved').length,
-        claimedItems: items.filter(i => i.status === 'claimed').length,
-        rejectedItems: items.filter(i => i.status === 'rejected').length,
-        pendingClaims: claims.filter(c => c.status === 'pending').length,
-        activeLostItems: lostItems.filter(l => l.status === 'active').length,
-        categoryCounts,
-        recentItemsCount: recentItems.length
-    });
+        res.json({
+            totalItems: items.length,
+            pendingItems: items.filter(i => i.status === 'pending').length,
+            approvedItems: items.filter(i => i.status === 'approved').length,
+            claimedItems: items.filter(i => i.status === 'claimed').length,
+            rejectedItems: items.filter(i => i.status === 'rejected').length,
+            pendingClaims: claims.filter(c => c.status === 'pending').length,
+            activeLostItems: lostItems.filter(l => l.status === 'active').length,
+            categoryCounts,
+            recentItemsCount: recentItems.length
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch stats' });
+    }
 });
 
-// Get public stats (safe to show everyone)
-app.get('/api/stats', (req, res) => {
-    const items = readData(ITEMS_FILE);
-    const approvedItems = items.filter(i => i.status === 'approved' || i.status === 'claimed');
-    
-    // Category breakdown (only approved items)
-    const categoryCounts = {};
-    approvedItems.forEach(item => {
-        categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
-    });
+// Get public stats
+app.get('/api/stats', async (req, res) => {
+    try {
+        const items = await getCollection('items');
+        const approvedItems = items.filter(i => i.status === 'approved' || i.status === 'claimed');
 
-    // Items found this month
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const thisMonthItems = approvedItems.filter(item => new Date(item.date_found) >= startOfMonth);
+        const categoryCounts = {};
+        approvedItems.forEach(item => {
+            categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
+        });
 
-    // Success rate (claimed vs total)
-    const claimedCount = approvedItems.filter(i => i.status === 'claimed').length;
-    const successRate = approvedItems.length > 0 ? Math.round((claimedCount / approvedItems.length) * 100) : 0;
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const thisMonthItems = approvedItems.filter(item => new Date(item.date_found) >= startOfMonth);
 
-    res.json({
-        totalFoundItems: approvedItems.length,
-        itemsThisMonth: thisMonthItems.length,
-        claimedItems: claimedCount,
-        successRate,
-        categoryCounts
-    });
+        const claimedCount = approvedItems.filter(i => i.status === 'claimed').length;
+        const successRate = approvedItems.length > 0 ? Math.round((claimedCount / approvedItems.length) * 100) : 0;
+
+        res.json({
+            totalFoundItems: approvedItems.length,
+            itemsThisMonth: thisMonthItems.length,
+            claimedItems: claimedCount,
+            successRate,
+            categoryCounts
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch stats' });
+    }
 });
 
 // Get lost items (admin)
-app.get('/api/admin/lost-items', (req, res) => {
-    const LOST_ITEMS_FILE = path.join(DATA_DIR, 'lost-items.json');
-    if (!fs.existsSync(LOST_ITEMS_FILE)) {
-        return res.json([]);
+app.get('/api/admin/lost-items', async (req, res) => {
+    try {
+        const lostItems = await getCollection('lostItems');
+        res.json(lostItems);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch lost items' });
     }
-    const lostItems = readData(LOST_ITEMS_FILE);
-    res.json(lostItems);
 });
 
 // Match lost item with found item (admin)
-app.post('/api/admin/match-item', (req, res) => {
-    const { lost_item_id, found_item_id, admin_name } = req.body;
-    
-    if (!lost_item_id || !found_item_id) {
-        return res.status(400).json({ error: 'Missing required fields' });
+app.post('/api/admin/match-item', async (req, res) => {
+    try {
+        const { lost_item_id, found_item_id, admin_name } = req.body;
+
+        if (!lost_item_id || !found_item_id) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const [lostItem, foundItem] = await Promise.all([
+            getDocument('lostItems', lost_item_id),
+            getDocument('items', found_item_id)
+        ]);
+
+        if (!lostItem || !foundItem) {
+            return res.status(404).json({ error: 'Item not found' });
+        }
+
+        await updateDocument('lostItems', lost_item_id, {
+            matched_item_id: found_item_id,
+            status: 'matched',
+            matched_at: new Date().toISOString(),
+            matched_by: admin_name || 'Admin'
+        });
+
+        const history = foundItem.history || [];
+        history.push({
+            action: 'matched_with_lost_item',
+            timestamp: new Date().toISOString(),
+            by: admin_name || 'Admin',
+            details: `Matched with lost item report by ${lostItem.owner_name}`
+        });
+        await updateDocument('items', found_item_id, { status: 'claimed', history });
+
+        sendMatchNotificationEmail(lostItem, foundItem).catch(err => {
+            console.error('Failed to send email notification:', err);
+        });
+
+        res.json({ message: 'Items matched successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to match items' });
     }
-
-    const LOST_ITEMS_FILE = path.join(DATA_DIR, 'lost-items.json');
-    if (!fs.existsSync(LOST_ITEMS_FILE)) {
-        return res.status(404).json({ error: 'Lost items file not found' });
-    }
-
-    const lostItems = readData(LOST_ITEMS_FILE);
-    const items = readData(ITEMS_FILE);
-
-    const lostItemIndex = lostItems.findIndex(l => l.id === lost_item_id);
-    const foundItemIndex = items.findIndex(i => i.id === found_item_id);
-
-    if (lostItemIndex === -1 || foundItemIndex === -1) {
-        return res.status(404).json({ error: 'Item not found' });
-    }
-
-    // Match the items
-    lostItems[lostItemIndex].matched_item_id = found_item_id;
-    lostItems[lostItemIndex].status = 'matched';
-    lostItems[lostItemIndex].matched_at = new Date().toISOString();
-    lostItems[lostItemIndex].matched_by = admin_name || 'Admin';
-
-    // Add to found item history
-    if (!items[foundItemIndex].history) items[foundItemIndex].history = [];
-    items[foundItemIndex].history.push({
-        action: 'matched_with_lost_item',
-        timestamp: new Date().toISOString(),
-        by: admin_name || 'Admin',
-        details: `Matched with lost item report by ${lostItems[lostItemIndex].owner_name}`
-    });
-
-    writeData(LOST_ITEMS_FILE, lostItems);
-    writeData(ITEMS_FILE, items);
-
-    // Send email notification to the lost item owner
-    const lostItem = lostItems[lostItemIndex];
-    const foundItem = items[foundItemIndex];
-    
-    sendMatchNotificationEmail(lostItem, foundItem).catch(err => {
-        console.error('Failed to send email notification:', err);
-        // Don't fail the request if email fails
-    });
-
-    res.json({ message: 'Items matched successfully' });
 });
 
 // ========================================
@@ -663,7 +706,6 @@ Viking Vault - South Brunswick High School
         `
     };
 
-    // If email is configured, send it
     if (emailTransporter) {
         try {
             await emailTransporter.sendMail({
@@ -673,11 +715,9 @@ Viking Vault - South Brunswick High School
             console.log(`✅ Email sent to ${lostItem.owner_email}`);
         } catch (error) {
             console.error('Email sending error:', error);
-            // Log email content for demo purposes
             logEmailForDemo(emailContent);
         }
     } else {
-        // Demo mode: Log email content
         logEmailForDemo(emailContent);
     }
 }
@@ -691,12 +731,18 @@ function logEmailForDemo(emailContent) {
     console.log('==========================================\n');
 }
 
-// Start server
+// ========================================
+// Start Server
+// ========================================
+
+await initAdminCredentials();
+
 app.listen(PORT, () => {
     console.log(`\n🔍 Viking Vault - School Lost & Found`);
     console.log(`   Server running at http://localhost:${PORT}`);
     console.log(`   Admin panel: http://localhost:${PORT}/admin.html`);
     console.log(`   Default admin: username "admin", password "school2024"`);
+    console.log(`   Database: Firebase Firestore (project: viking-vault-c8c2a)`);
     if (emailTransporter) {
         console.log(`   ✅ Email notifications: ENABLED`);
         console.log(`   📧 Sending from: ${EMAIL_CONFIG.from}`);
