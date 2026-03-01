@@ -139,7 +139,7 @@ img:not(.logo-image):not(.features-img) {
     transition: all var(--transition-base);
 }
 
-img:not(.logo-image):not(.features-img):hover {
+img:not(.logo-image):not(.features-img):not(.features-puzzle-img):hover {
     box-shadow: 
         0 8px 24px rgba(139, 92, 246, 0.4),
         0 0 0 3px rgba(139, 92, 246, 0.4),
@@ -1104,6 +1104,26 @@ button, input, select, textarea {
     color: #334155;
     max-width: 600px;
     margin: 0 auto;
+}
+
+.features-centered {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.features-summary {
+    font-size: var(--font-size-lg);
+    color: #000000;
+    line-height: 1.75;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.features-puzzle-img {
+    display: block;
+    margin: 0 auto;
+    max-width: 640px;
+    width: 100%;
 }
 
 .features-progress {
