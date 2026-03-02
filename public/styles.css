@@ -132,14 +132,14 @@ img {
 }
 
 /* Ensure images pop out from dark backgrounds */
-img:not(.logo-image):not(.features-img) {
+img:not(.logo-image):not(.features-puzzle-img):not(.values-puzzle-img) {
     box-shadow: 
         0 4px 12px rgba(0, 0, 0, 0.3),
         0 0 0 2px rgba(139, 92, 246, 0.2);
     transition: all var(--transition-base);
 }
 
-img:not(.logo-image):not(.features-img):not(.features-puzzle-img):hover {
+img:not(.logo-image):not(.features-img):not(.features-puzzle-img):not(.values-puzzle-img):hover {
     box-shadow: 
         0 8px 24px rgba(139, 92, 246, 0.4),
         0 0 0 3px rgba(139, 92, 246, 0.4),
@@ -1052,7 +1052,7 @@ button, input, select, textarea {
    ======================================== */
 
 .features-showcase {
-    padding: var(--spacing-3xl) 0;
+    padding: var(--spacing-xl) 0;
     background: #e2e8f0;
     position: relative;
     overflow: hidden;
@@ -1116,7 +1116,7 @@ button, input, select, textarea {
     font-size: var(--font-size-lg);
     color: #000000;
     line-height: 1.75;
-    margin-bottom: var(--spacing-2xl);
+    margin-bottom: var(--spacing-sm);
 }
 
 .features-puzzle-img {
@@ -1124,6 +1124,10 @@ button, input, select, textarea {
     margin: 0 auto;
     max-width: 640px;
     width: 100%;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    outline: none;
 }
 
 .features-progress {
@@ -3415,6 +3419,23 @@ button, input, select, textarea {
 .value-item p {
     color: #334155;
     font-size: var(--font-size-sm);
+}
+
+.values-image-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-2xl);
+}
+
+.values-puzzle-img {
+    max-width: 960px;
+    width: 100%;
+    height: auto;
+    display: block;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
 }
 
 .mission-cta {
